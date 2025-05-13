@@ -1,0 +1,19 @@
+:root {
+  /* Primärfarben */
+  --primary-main: #E09600;
+  --primary-light: #ffb733;
+  --primary-dark: #c67a00;
+  
+  /* Sekundärfarben */
+  --secondary-main: #119DA4;
+  --secondary-light: #3ab7be;
+  --secondary-dark: #0d7a80;
+  
+  /* Hintergrundfarben */
+  --background-default: #1F2041;
+  --background-paper: #2a2b52;
+  
+  /* Textfarben */
+  --text-primary: #FFF8F0;
+  --text-secondary: #d0d0d0;
+} 

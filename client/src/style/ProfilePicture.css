@@ -1,0 +1,20 @@
+.profile-picture-container {
+	position: fixed;
+	top: 20px;
+	right: 20px;
+	z-index: 1000;
+}
+
+.profile-picture {
+	width: 40px;
+	height: 40px;
+	border-radius: 50%;
+	border: 2px solid var(--secondary-main);
+	object-fit: cover;
+	transition: all 0.3s ease;
+	cursor: pointer;
+}
+
+.profile-picture:hover {
+	transform: scale(1.05);
+}

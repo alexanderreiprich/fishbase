@@ -1,0 +1,36 @@
+.register-form {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  max-width: 400px;
+  margin: 0 auto;
+  padding: 24px;
+  border-radius: 8px;
+  background-color: var(--background-default);
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+}
+
+.register-form h2 {
+  color: var(--text-primary);
+  margin-bottom: 16px;
+}
+
+.register-form .MuiInputLabel-root {
+  color: var(--text-primary);
+}
+
+.register-form .MuiOutlinedInput-root {
+  color: var(--text-primary);
+}
+
+.register-form .MuiOutlinedInput-root fieldset {
+  border-color: var(--text-primary);
+}
+
+.register-form .MuiOutlinedInput-root:hover fieldset {
+  border-color: var(--secondary-main);
+}
+
+.register-form .MuiButton-root {
+  margin-top: 16px;
+} 
