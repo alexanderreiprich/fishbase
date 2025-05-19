@@ -2,7 +2,7 @@ import { useAuth } from "../context/AuthContext";
 import "../style/ProfilePicture.css";
 import { useNavigate } from "react-router-dom";
 
-const ProfilePicture: React.FC = () => {
+export default function ProfilePicture(){
   const { user } = useAuth();
   const navigate = useNavigate();
 
@@ -19,5 +19,3 @@ const ProfilePicture: React.FC = () => {
     />
   );
 };
-
-export default ProfilePicture;

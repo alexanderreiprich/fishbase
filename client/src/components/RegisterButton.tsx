@@ -3,7 +3,7 @@ import { Dialog, DialogContent } from "@mui/material";
 import RegisterForm from "./RegisterForm";
 import StyledButton from "./StyledButton";
 
-const RegisterButton: React.FC = () => {
+export default function RegisterButton(){
   const [open, setOpen] = useState(false);
 
   const handleClickOpen = () => {
@@ -37,5 +37,3 @@ const RegisterButton: React.FC = () => {
     </div>
   );
 };
-
-export default RegisterButton;

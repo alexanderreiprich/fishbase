@@ -4,7 +4,7 @@ import { useAuth } from "../context/AuthContext";
 import ProfilePicture from "./ProfilePicture";
 import "../style/Header.css";
 
-const Header: React.FC = () => {
+export default function Header() {
   const navigate = useNavigate();
   const { user } = useAuth();
 
@@ -46,5 +46,3 @@ const Header: React.FC = () => {
     </AppBar>
   );
 };
-
-export default Header;
