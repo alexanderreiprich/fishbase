@@ -11,7 +11,7 @@ import { useAuth } from "../context/AuthContext";
 import "../style/RegisterForm.css";
 import { useNavigate } from 'react-router-dom';
 
-const RegisterForm: React.FC = () => {
+export default function RegisterForm() {
   const [username, setUsername] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -105,5 +105,3 @@ const RegisterForm: React.FC = () => {
     </Box>
   );
 };
-
-export default RegisterForm;

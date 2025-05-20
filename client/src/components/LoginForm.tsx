@@ -11,7 +11,7 @@ import { useAuth } from "../context/AuthContext";
 import "../style/LoginForm.css";
 import { useNavigate } from 'react-router-dom';
 
-const LoginForm: React.FC = () => {
+export default function LoginForm() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [formError, setFormError] = useState<string | null>(null);
@@ -69,5 +69,3 @@ const LoginForm: React.FC = () => {
     </Box>
   );
 };
-
-export default LoginForm;

@@ -3,7 +3,7 @@ import { useAuth } from "../context/AuthContext";
 import { useNavigate } from "react-router-dom";
 import StyledButton from "./StyledButton";
 
-const LogoutButton: React.FC = () => {
+export default function LogoutButton() {
   const { logout } = useAuth();
   const navigate = useNavigate();
 
@@ -22,4 +22,3 @@ const LogoutButton: React.FC = () => {
   );
 };
 
-export default LogoutButton;
