@@ -26,10 +26,10 @@ export default function Header() {
 
         <Box className="navigation-container">
           <Button color="inherit" onClick={() => navigate("/search")}>
-            Create
+            Search
           </Button>
           <Button color="inherit" onClick={() => navigate("/community")}>
-            Search
+            Community
           </Button>
         </Box>
 
