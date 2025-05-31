@@ -1,6 +1,7 @@
 import { Button, Card, CardActions, CardContent, CardMedia, Typography } from "@mui/material";
 import "../style/ProfilePicture.css";
 import { Animal } from "../interfaces/Animal";
+import { InhabitantType } from "../interfaces/InhabitantType";
 
 
 export default function AnimalCard(
@@ -10,6 +11,14 @@ export default function AnimalCard(
   animal: Animal
   }) {
 
+  function getAnimalType() {
+    switch (animal.type) {
+      case 0: return "Fisch";
+      case 1: return "Wirbellose";
+      default: return "Lebendig";
+    }
+  }
+
   return (
     <Card variant="outlined" sx={{ maxWidth: 300}}>
       <CardMedia 
@@ -18,16 +27,19 @@ export default function AnimalCard(
         sx={{ height: 140 }}
       />
       <CardContent>
-        <Typography gutterBottom component="div">
+        <Typography gutterBottom sx={{ fontSize: 14 }}>
+          {animal.latinName}
+        </Typography>
+        <Typography gutterBottom variant="h5" >
           {animal.name}
         </Typography>
-          <ul>
+        <Typography sx={{mb: 1.5}}>
+          {getAnimalType()}
+        </Typography>
             {/* TODO: fix display of order and displayed information */}
-            <li>Lat: {animal.latinName}</li>
-            <li>Habitat: {animal.habitat.region} | {animal.habitat.waterQuality.temperature}°C</li> 
-            <li>Farbe: {animal.color}</li>
-            <li>Natürliche Feinde: <ul>{animal.predators.map(animal => <li>{animal.food}</li>)}</ul></li>
-          </ul>
+            Habitat: {animal.habitat.region} | {animal.habitat.waterQuality.temperature}°C
+            Farbe: {animal.color}
+            Natürliche Feinde: <ul>{animal.predators.map(animal => <li>{animal.food}</li>)}</ul>
       </CardContent>
       <CardActions>
         <Button>Auswählen</Button>
