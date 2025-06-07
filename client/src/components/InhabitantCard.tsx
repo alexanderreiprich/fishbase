@@ -13,7 +13,7 @@ export default function InhabitantCard(
   return (
     <Card variant="outlined">
       <CardMedia 
-        image={inhabitant.image}
+        image={inhabitant.image ? URL.createObjectURL(inhabitant.image) : ""}
         title={inhabitant.name}
       />
       <CardContent>

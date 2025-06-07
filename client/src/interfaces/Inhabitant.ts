@@ -7,5 +7,5 @@ export interface Inhabitant {
   habitat: Habitat,
   color: string,
   predators: Animal[],
-  image: string
+  image: Blob
 }

@@ -1,3 +1,3 @@
 export enum InhabitantType {
-  FISH, INVERTEBRATE
+  FISH, INVERTEBRATE, PLANT
 }

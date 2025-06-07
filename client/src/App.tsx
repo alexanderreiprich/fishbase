@@ -10,6 +10,7 @@ import theme from "./theme";
 import Home from "./pages/Home";
 import Header from "./components/Header";
 import SearchPage from "./pages/SearchPage";
+import ListPage from "./pages/ListPage";
 import CommunityPage from "./pages/CommunityPage";
 
 const ProtectedRoute: React.FC<{ children: React.ReactNode }> = ({ children }) => {
@@ -65,6 +66,14 @@ function App() {
               element={
                 <ProtectedRoute>
                   <CommunityPage />
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path="/list"
+              element={
+                <ProtectedRoute>
+                  <ListPage />
                 </ProtectedRoute>
               }
             />

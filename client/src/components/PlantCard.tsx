@@ -13,7 +13,7 @@ export default function PlantCard(
   return (
     <Card variant="outlined">
       <CardMedia 
-        image={plant.image}
+        image={plant.image ? URL.createObjectURL(plant.image) : ""}
         title={plant.name}
         sx={{ height: 140 }}
       />

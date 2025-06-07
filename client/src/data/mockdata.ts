@@ -3,7 +3,40 @@ import { InhabitantType } from "../interfaces/InhabitantType";
 import { Plant } from "../interfaces/Plant";
 
 export class MockData {
-  public getMockAnimal(): Animal {
+
+  private async fetchImages(): Promise<Blob[]> {
+    // Lokale Bilder aus dem public-Ordner verwenden
+    let animalImage = "/images/mock-fish.jpg";
+    let plantImage = "/images/mock-plant.jpg";
+    
+    try {
+      const [animalResponse, plantResponse] = await Promise.all([
+        fetch(animalImage),
+        fetch(plantImage)
+      ]);
+
+      if (!animalResponse.ok || !plantResponse.ok) {
+        throw new Error('Fehler beim Herunterladen der Bilder');
+      }
+
+      const [animalBlob, plantBlob] = await Promise.all([
+        animalResponse.blob(),
+        plantResponse.blob()
+      ]);
+
+      return [animalBlob, plantBlob];
+    } catch (error) {
+      console.error('Fehler beim Laden der Bilder:', error);
+      // Fallback: Leere Blobs zurückgeben
+      return [
+        new Blob([], { type: 'image/jpeg' }),
+        new Blob([], { type: 'image/jpeg' })
+      ];
+    }
+  }
+
+  public async getMockAnimal(): Promise<Animal> {
+    const [animalBlob] = await this.fetchImages();
     const x: Animal = {
       type: InhabitantType.FISH,
       length: 213,
@@ -20,13 +53,15 @@ export class MockData {
       },
       color: "white",
       predators: [],
-      image: "https://cdn.britannica.com/34/240534-050-B8C4B11E/Porcupine-fish-Diodon-hystox.jpg"
+      image: animalBlob
     };
     return x;
   }
 
-  public getMockPlant(): Plant {
+  public async getMockPlant(): Promise<Plant> {
+    const [, plantBlob] = await this.fetchImages();
     const x: Plant = {
+      type: InhabitantType.PLANT,
       minHeight: 23,
       maxHeight: 23,
       name: "pflanzli",
@@ -41,7 +76,7 @@ export class MockData {
       },
       color: "green",
       predators: [],
-      image: "https://www.aquarienpflanzen-shop.de/media/image/product/588/md/pflanzenbox-xl-22-toepfe-aquarienpflanzen-mutterpflanze.jpg"
+      image: plantBlob
     };
     return x;
   }
