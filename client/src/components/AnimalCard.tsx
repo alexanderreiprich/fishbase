@@ -13,16 +13,16 @@ export default function AnimalCard(
 
   function getAnimalType() {
     switch (animal.type) {
-      case 0: return "Fisch";
-      case 1: return "Wirbellose";
-      default: return "Lebendig";
+      case InhabitantType.FISH: return "Fisch";
+      case InhabitantType.INVERTEBRATE: return "Wirbellose";
+      default: return "Tier";
     }
   }
 
   return (
     <Card variant="outlined" sx={{ maxWidth: 300}}>
       <CardMedia 
-        image={animal.image}
+        image={animal.image ? URL.createObjectURL(animal.image) : ""}
         title={animal.name}
         sx={{ height: 140 }}
       />

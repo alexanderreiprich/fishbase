@@ -19,5 +19,5 @@ app.use('/api/inhabitants', inhabitantsRoutes);
 
 // Server starten
 app.listen(PORT, () => {
-  console.log(`Server runs on port ${PORT}`);
+  console.log(`Server läuft auf Port ${PORT}`);
 });
