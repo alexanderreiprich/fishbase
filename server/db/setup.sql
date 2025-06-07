@@ -3,18 +3,18 @@ USE fishbase;
 
 -- benutzertabelle erstellen
 CREATE TABLE IF NOT EXISTS users (
-  id SMALLINT PRIMARY KEY,
+  id SMALLINT PRIMARY KEY AUTO_INCREMENT,
   picture BLOB,
   username VARCHAR(20) NOT NULL,
   email VARCHAR(50) NOT NULL,
-  password VARCHAR(50) NOT NULL,
+  password VARCHAR(80) NOT NULL,
   favoritefish SMALLINT,
   aquarium BLOB
 );
 
 -- aquarientabelle erstellen
 CREATE TABLE IF NOT EXISTS aquariums (
-  id SMALLINT PRIMARY KEY,
+  id SMALLINT PRIMARY KEY AUTO_INCREMENT,
   userid SMALLINT NOT NULL,
   name VARCHAR(50) NOT NULL,
   content VARCHAR(200),
@@ -23,7 +23,7 @@ CREATE TABLE IF NOT EXISTS aquariums (
 
 -- artentabelle erstellen
 CREATE TABLE IF NOT EXISTS inhabitants (
-  id SMALLINT PRIMARY KEY,
+  id SMALLINT PRIMARY KEY AUTO_INCREMENT,
   name VARCHAR(100) NOT NULL,
   latinname VARCHAR(100),
   habitat VARCHAR(50),

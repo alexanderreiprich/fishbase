@@ -12,8 +12,10 @@ app.use(express.json());
 
 // Routes
 const usersRoutes = require('./routes/users');
+const inhabitantsRoutes = require('./routes/inhabitants');
 
 app.use('/api/users', usersRoutes);
+app.use('/api/inhabitants', inhabitantsRoutes);
 
 // Server starten
 app.listen(PORT, () => {
