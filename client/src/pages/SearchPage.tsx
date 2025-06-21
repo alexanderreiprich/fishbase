@@ -36,9 +36,6 @@ const SearchPage: React.FC = () => {
   }, []);
 
   const handleSearch = async (searchParams: SearchOptions) => {
-    // Hier würde normalerweise die API-Abfrage stattfinden
-    console.log('Suchparameter:', searchParams);
-
     const repository = InhabitantRepository.getInstance();
     const data = await repository.getInhabitants(searchParams);
 
