@@ -2,7 +2,7 @@ import { InhabitantType } from "./InhabitantType";
 
 export interface SearchOptions {
 	searchText: string | null,
-	type: InhabitantType | null,
+	type: string | null,
 	habitat: string | null,
 	color: string | null,
 	salinity: number | null,
