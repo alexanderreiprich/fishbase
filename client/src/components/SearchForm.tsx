@@ -32,11 +32,13 @@ export const SearchForm: React.FC<SearchFormProps> = ({ onSearch }) => {
   const [phValue, setPhValue] = useState('');
   const [temperature, setTemperature] = useState('');
 
+  const typeStrings = ["fish", "invertebrate", "plant"];
+
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     onSearch({
       searchText: search == "" ? null : search,
-      type : type == "" ? null : type,
+      type: type === "" ? null : typeStrings[type as number],
       habitat: habitat == "" ? null : habitat,
       color: color == "" ? null : color,
       salinity: salinity === '' ? null : Number(salinity),
@@ -87,7 +89,7 @@ export const SearchForm: React.FC<SearchFormProps> = ({ onSearch }) => {
                     label="Typ"
                     onChange={e => setType(e.target.value as InhabitantType)}
                   >
-                    <MenuItem value="">Alle</MenuItem>
+                    <MenuItem value="" >Alle</MenuItem>
                     <MenuItem value={InhabitantType.FISH}>Fisch</MenuItem>
                     <MenuItem value={InhabitantType.INVERTEBRATE}>Wirbellose</MenuItem>
                     <MenuItem value={InhabitantType.PLANT}>Pflanze</MenuItem>

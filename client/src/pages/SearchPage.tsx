@@ -56,9 +56,6 @@ const SearchPage: React.FC = () => {
 
     setAnimals(animals);
     setPlants(plants);
-
-    console.log(animals);
-    console.log(plants);
   };
 
   if (loading) {
