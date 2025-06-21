@@ -46,11 +46,16 @@ const SearchPage: React.FC = () => {
     let plants: Plant[] = [];
 
     for (let i = 0; i < data.length; i++) {
-      if (data[i].type == InhabitantType.FISH || data[i].type == InhabitantType.INVERTEBRATE) {
-        animals.push(data[i] as Animal);
-      }
-      else {
-        plants.push(data[i] as Plant);
+      switch (data[i].type) {
+        case InhabitantType.FISH:
+        case InhabitantType.INVERTEBRATE:
+          animals.push(data[i] as Animal);
+          break;
+        case InhabitantType.PLANT:
+          plants.push(data[i] as Plant);
+          break;
+        default:
+          break;
       }
     }
 

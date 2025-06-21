@@ -72,17 +72,17 @@ router.post("/search", async (req, res) => {
 
     // 1. Sind alle Bedingungen wahr?
     const [inhabitants] = await pool.query(
-      "SELECT * FROM inhabitants WHERE name = ? AND type = ? AND habitat = ? AND color = ?", // TODO: Include Water Quality
+      "SELECT * FROM inhabitants WHERE name = ? AND type = ? AND habitat = ? AND color = ?", // TODO: Include Water Quality and Predators
       [searchText, type, habitat, color]
     );
-		result = inhabitants;
+    result = inhabitants;
     if (inhabitants.length == 0) {
       // 2. Ist wenigstens eine Bedingung wahr?
       const [inhabitants] = await pool.query(
         "SELECT * FROM inhabitants WHERE name = ? OR type = ? OR habitat = ? OR color = ?",
         [searchText, type, habitat, color]
       );
-			result = inhabitants;
+      result = inhabitants;
       if (inhabitants.length == 0) {
         // 3. Ist der Suchtext irgendwo enthalten?
         let expandedSearchText = `%${req.body.searchText}%`;
@@ -90,7 +90,7 @@ router.post("/search", async (req, res) => {
           "SELECT * FROM inhabitants WHERE name LIKE ? OR type = ? OR habitat = ? OR color = ?",
           [expandedSearchText, type, habitat, color]
         );
-				result = inhabitants;
+        result = inhabitants;
         if (inhabitants.length == 0) {
           // 4. Fuzzy-Search und Stem-Search aktivieren
           return res
