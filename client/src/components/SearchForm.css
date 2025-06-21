@@ -1,0 +1,95 @@
+.searchform-paper {
+  /* background: var(--background-default); */
+  padding: 24px;
+  margin-bottom: 24px;
+}
+
+.searchform-searchfield input {
+  background: var(--secondary-main);
+  border-radius: 8px;
+  font-size: 18px;
+	border-color: var(--primary-main);
+}
+
+.searchform-searchfield {
+  margin-bottom: 8px;
+}
+
+/* Das Suchfeld soll keine Border haben */
+.searchform-searchfield .MuiOutlinedInput-root .MuiOutlinedInput-notchedOutline {
+  border: 0
+}
+
+.searchform-advanced-toggle {
+  font-style: italic;
+  cursor: pointer;
+  color: var(--text-primary);
+  user-select: none;
+}
+
+.searchform-colorinput {
+  width: 40px;
+  height: 32px;
+  border: 1px solid;
+  border-radius: 4px;
+  margin-right: 8px;
+	border-color: var(--primary-main);
+}
+
+.searchform-label {
+  text-align: left;
+  font-weight: 400;
+  color: white;
+}
+
+.searchform-waterquality-group {
+  display: flex;
+  gap: 8px;
+} 
+
+.searchform-text-input {
+	color: var(--text-primary); 
+	border-color: white !important;
+}
+
+.searchform-input-label,
+.MuiInputLabel-root,
+.MuiInputLabel-root.MuiInputLabel-shrink {
+  color: white !important;
+}
+
+.MuiInputLabel-root.Mui-focused,
+.searchform-input-label.Mui-focused {
+  color: var(--primary-main) !important;
+}
+
+.searchform-paper .MuiOutlinedInput-root .MuiOutlinedInput-notchedOutline {
+  border-color: white !important;
+}
+
+.searchform-paper .MuiOutlinedInput-root:hover .MuiOutlinedInput-notchedOutline {
+  border-color: white !important;
+}
+
+.searchform-paper .MuiOutlinedInput-root.Mui-focused .MuiOutlinedInput-notchedOutline {
+  border-color: white !important;
+}
+
+.searchform-text-input input::placeholder,
+.searchform-searchfield input::placeholder {
+  color: white !important;
+  opacity: 1;
+}
+
+/* Für MUI Select: Label und Placeholder weiß */
+.searchform-input-label {
+  color: white !important;
+}
+
+/* Für autofill (Chrome) */
+.searchform-text-input input:-webkit-autofill {
+  -webkit-text-fill-color: white !important;
+  box-shadow: 0 0 0 1000px var(--secondary-main) inset;
+  -webkit-box-shadow: 0 0 0 1000px var(--secondary-main) inset;
+}
+

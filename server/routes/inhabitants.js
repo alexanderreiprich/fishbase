@@ -7,21 +7,11 @@ router.get('/all', async (req, res) => {
 	try {		
     console.log(`Route /all wurde aufgerufen`);
 		const [inhabitants] = await pool.query(
-			'SELECT * FROM inhabitants LIMIT 10' // TODO: Limit rausnehmen
+			'SELECT * FROM inhabitants'
 		);
 		if (!inhabitants || inhabitants.length === 0) {
 			console.log("Keine Daten gefunden!");
 			return res.status(404).json({ message: 'Keine Inhabitants gefunden' });
-		}
-
-		// Debug-Log für das erste Bild
-		if (inhabitants[0].image) {
-			console.log("Erstes Bild:", {
-				hasImage: true,
-				imageType: typeof inhabitants[0].image,
-				imageLength: inhabitants[0].image.length,
-				isBuffer: Buffer.isBuffer(inhabitants[0].image)
-			});
 		}
 
 		// Bilder in Base64 konvertieren
@@ -73,17 +63,18 @@ router.get('/:id', async (req, res) => {
 });
 
 // Inhabitant abfragen
-router.get('/', async (req, res) => {
+router.post('/search', async (req, res) => {
   try {
-    console.log("Route / wurde aufgerufen");
-    const { name, latinName, habitat, color, predators } = req.body;
-
+    console.log("Route /search wurde aufgerufen");
+    const { searchText, type, habitat, color, salinity, phValue, temperature } = req.body;
+		console.log(req.body);
 		const [inhabitants] = await pool.query(
-			'SELECT * FROM inhabitants WHERE name = ? OR latinName = ? OR habitat = ? OR color = ? OR predators = ?',
-			[name, latinName, habitat, color, predators]
+			'SELECT * FROM inhabitants WHERE name = ?', // TODO: Include Water Quality
+			[searchText]
 		);
+		console.log(inhabitants);
 
-		if (inhabitants.length > 0) {
+		if (inhabitants.length == 0) {
 			return res.status(400).json({ message: 'Spezies wurde nicht gefunden'});
 		}
 

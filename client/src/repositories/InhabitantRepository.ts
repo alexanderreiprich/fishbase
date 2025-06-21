@@ -2,6 +2,7 @@ import { Animal } from "../interfaces/Animal";
 import { Plant } from "../interfaces/Plant";
 import { InhabitantType } from "../interfaces/InhabitantType";
 import { Habitat } from "../interfaces/Habitat";
+import { SearchOptions } from "../interfaces/SearchOptions";
 
 interface ApiInhabitant {
   id: number;
@@ -10,7 +11,7 @@ interface ApiInhabitant {
   habitat: string;
   color: string;
   predators: string;
-  image: string;
+  image: string | { type: string; data: number[] };
   type: string;
   length?: number;
   food?: string;
@@ -41,6 +42,30 @@ export class InhabitantRepository {
     };
   }
 
+  public async getInhabitants(searchOptions: SearchOptions): Promise<(Animal | Plant)[]> {
+    try {
+      const response = await fetch(`${this.baseUrl}/search`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(searchOptions)
+      });
+      if (!response.ok) {
+        throw new Error('Fehler beim Abrufen der Daten');
+      }
+      const data: ApiInhabitant[] = await response.json();
+      console.log(data);
+      const transformedInhabitants = await Promise.all(
+        data.map(apiData => this.transformToInhabitant(apiData))
+      );
+      return transformedInhabitants;
+    } catch (error) {
+      console.error('Fehler beim Abrufen der Inhabitants:', error);
+      throw error;
+    }
+  }
+
   public async getAllInhabitants(): Promise<(Animal | Plant)[]> {
     try {
       const response = await fetch(`${this.baseUrl}/all`, this.getFetchOptions());
@@ -68,10 +93,10 @@ export class InhabitantRepository {
       color: apiData.color,
       // predators: await this.parsePredators(apiData.predators), // TODO: Fix Loop
 			predators: [],
-      image: apiData.image ? new Blob(
-        [Uint8Array.from(atob(apiData.image), c => c.charCodeAt(0))],
-        { type: 'image/jpeg' }
-      ) : null
+      image:
+        apiData.image && typeof apiData.image === "object" && "data" in apiData.image // Checks if this is a Buffer object that contains the image
+          ? new Blob([new Uint8Array((apiData.image as any).data)], { type: 'image/jpeg' }) // Creates a blob from the buffer object
+          : null
     };
     if (apiData.type === 'fish' || apiData.type === 'invertebrate') {
       return {
