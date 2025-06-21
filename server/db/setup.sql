@@ -1,8 +1,15 @@
 CREATE DATABASE IF NOT EXISTS fishbase;
 USE fishbase;
 
+SET FOREIGN_KEY_CHECKS = 0;
+SET SESSION sql_mode = '';
+SET autocommit = 0;
+START TRANSACTION;
+
+DROP TABLE IF EXISTS users;
+
 -- benutzertabelle erstellen
-CREATE TABLE IF NOT EXISTS users (
+CREATE TABLE users (
   id SMALLINT PRIMARY KEY AUTO_INCREMENT,
   picture BLOB,
   username VARCHAR(20) NOT NULL,
@@ -12,8 +19,10 @@ CREATE TABLE IF NOT EXISTS users (
   aquarium MEDIUMBLOB
 );
 
+DROP TABLE IF EXISTS aquariums;
+
 -- aquarientabelle erstellen
-CREATE TABLE IF NOT EXISTS aquariums (
+CREATE TABLE aquariums (
   id SMALLINT PRIMARY KEY AUTO_INCREMENT,
   userid SMALLINT NOT NULL,
   name VARCHAR(50) NOT NULL,
@@ -21,20 +30,54 @@ CREATE TABLE IF NOT EXISTS aquariums (
   FOREIGN KEY (userid) REFERENCES users(id)
 );
 
+DROP TABLE IF EXISTS inhabitants;
+
 -- artentabelle erstellen
-CREATE TABLE IF NOT EXISTS inhabitants (
+CREATE TABLE inhabitants (
   id SMALLINT PRIMARY KEY AUTO_INCREMENT,
   name VARCHAR(100) NOT NULL,
   latinname VARCHAR(100),
   habitat VARCHAR(50),
   color VARCHAR(30),
-  predators TEXT,          -- kommaseparierte liste von ids
+  predators TEXT,          -- extrabeschreibung, optional
   image MEDIUMBLOB,
   type VARCHAR(15) NOT NULL,  -- 'fish', 'invertebrate' oder 'plant'
   length FLOAT,            -- nur für tiere
   food VARCHAR(100),       -- nur für tiere
   minheight FLOAT,         -- nur für pflanzen
   maxheight FLOAT          -- nur für pflanzen
+);
+
+CREATE TABLE predators (
+  predator SMALLINT,
+  victim SMALLINT,
+  FOREIGN KEY (predator) REFERENCES inhabitants(id),
+  FOREIGN KEY (victim) REFERENCES inhabitants(id),
+  PRIMARY KEY (predator, victim)
+);
+
+CREATE TABLE inhabitants_aquariums (
+  iid SMALLINT,
+  aid SMALLINT,
+  amount SMALLINT,
+  FOREIGN KEY (iid) REFERENCES inhabitants(id),
+  FOREIGN KEY (aid) REFERENCES aquariums(id),
+  PRIMARY KEY (iid, aid)
+);
+
+CREATE TABLE terms (
+  tid SMALLINT PRIMARY KEY AUTO_INCREMENT,
+  term VARCHAR(100),
+  oid SMALLINT,
+  FOREIGN KEY (oid) REFERENCES terms(tid) --oberterm
+);
+
+CREATE TABLE synonyms (
+  termid SMALLINT,
+  symid SMALLINT,
+  FOREIGN KEY (termid) REFERENCES terms(id),
+  FOREIGN KEY (symid) REFERENCES terms(id),
+  PRIMARY KEY (termid, symid)
 );
 
 -- Einfügen von 40 beliebten Aquarienfischen
@@ -149,7 +192,8 @@ INSERT INTO inhabitants (name, latinname, habitat, color, type, minheight, maxhe
 ('Proserpinaca palustris', 'Proserpinaca palustris', 'Nordamerika', 'Rot-Grün', 'plant', 20.0, 40.0),
 ('Tonina fluviatilis', 'Tonina fluviatilis', 'Südamerika', 'Grün', 'plant', 20.0, 40.0),
 ('Myriophyllum tuberculatum', 'Myriophyllum tuberculatum', 'Asien', 'Rot', 'plant', 20.0, 40.0),
-('Cabomba caroliniana', 'Cabomba caroliniana', 'Südamerika', 'Grün', 'plant', 30.0, 50.0),
+('Cabomba caroliniana', 'Cabomba caroliniana', 'Südamerika', 'Grün', 'plant', 30.0, 50.0);
 
 -- nachher ausführbar mit mysql -u root -p fishbase
-
+SET FOREIGN_KEY_CHECKS = 1;
+COMMIT;
