@@ -55,7 +55,7 @@ export class InhabitantRepository {
         throw new Error('Fehler beim Abrufen der Daten');
       }
       const data: ApiInhabitant[] = await response.json();
-      console.log(data);
+
       const transformedInhabitants = await Promise.all(
         data.map(apiData => this.transformToInhabitant(apiData))
       );

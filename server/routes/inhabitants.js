@@ -77,7 +77,6 @@ router.post("/search", async (req, res) => {
     );
 		result = inhabitants;
     if (inhabitants.length == 0) {
-      console.log("nope");
       // 2. Ist wenigstens eine Bedingung wahr?
       const [inhabitants] = await pool.query(
         "SELECT * FROM inhabitants WHERE name = ? OR type = ? OR habitat = ? OR color = ?",
@@ -85,7 +84,6 @@ router.post("/search", async (req, res) => {
       );
 			result = inhabitants;
       if (inhabitants.length == 0) {
-        console.log("nope");
         // 3. Ist der Suchtext irgendwo enthalten?
         let expandedSearchText = `%${req.body.searchText}%`;
         const [inhabitants] = await pool.query(
@@ -94,7 +92,6 @@ router.post("/search", async (req, res) => {
         );
 				result = inhabitants;
         if (inhabitants.length == 0) {
-          console.log("nope");
           // 4. Fuzzy-Search und Stem-Search aktivieren
           return res
             .status(400)
@@ -103,7 +100,6 @@ router.post("/search", async (req, res) => {
       }
     }
 
-    console.log(result);
     res.status(200).json(result);
   } catch (error) {
     console.error("API-Fehler:", error);
