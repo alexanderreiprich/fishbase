@@ -90,6 +90,8 @@ CREATE TABLE synonyms (
   PRIMARY KEY (termid, symid)
 );
 
+
+
 -- Einfügen von 40 beliebten Aquarienfischen
 INSERT INTO inhabitants (name, latinname, habitat, color, type, length, food) VALUES
 ('Neonfisch', 'Paracheirodon innesi', 'Südamerika', 'Blau-Rot', 'fish', 3.5, 'Flocken, Lebendfutter'),
@@ -289,6 +291,137 @@ INSERT INTO terms (term, oid) VALUES
   ('Blauer Zwergbuntbarsch', 7),
   ('Gelber Zwergbuntbarsch', 7),
   ('Roter Zwergbuntbarsch', 7);
+
+  DROP TABLE IF EXISTS water_quality;
+
+  -- wasserqualitäten, wird referenziert von habitat
+CREATE TABLE water_quality (
+  wid SMALLINT,
+  iid SMALLINT,
+  salinity DECIMAL,
+  minTemperature DECIMAL,
+  maxTemperature DECIMAL,
+  minPh FLOAT,
+  maxPh FLOAT,
+  FOREIGN KEY (iid) REFERENCES inhabitants(id),
+  PRIMARY KEY (iid, wid)
+);
+
+-- wasserqualitäten pro fisch
+INSERT INTO water_quality (wid, iid, salinity, minTemperature, maxTemperature, minPh, maxPh) VALUES 
+(0,(SELECT id FROM inhabitants WHERE name='Neonfisch'), 0, 22, 25, 6.0, 7.0),
+(1,(SELECT id FROM inhabitants WHERE name='Guppy') ,0,24,28,6.8,7.8),
+(2,(SELECT id FROM inhabitants WHERE name='Platy') ,0,21,27,7.0,8.5),
+(3,(SELECT id FROM inhabitants WHERE name='Schwertträger') ,0,22,28,7.0,8.0),
+(4,(SELECT id FROM inhabitants WHERE name='Molly') ,0,24,28,7.0,8.2),
+(5,(SELECT id FROM inhabitants WHERE name='Kardinalfisch'),0,23,27,5.5,7.0),
+(6,(SELECT id FROM inhabitants WHERE name='Zebrabärbling'),0,22,28,6.5,7.5),
+(7,(SELECT id FROM inhabitants WHERE name='Siamesischer Kampffisch'),0,24,30,6.5,7.5),
+(8,(SELECT id FROM inhabitants WHERE name='Skalar'),0,24,28,6.5,7.5),
+(9,(SELECT id FROM inhabitants WHERE name='Diskusfisch'),0,28,30,6.0,7.0),
+(10,(SELECT id FROM inhabitants WHERE name='Antennenwels'),0,22,25,6.5,7.5),
+(11,(SELECT id FROM inhabitants WHERE name='Prachtgurami'),0,24,28,6.0,7.5),
+(12,(SELECT id FROM inhabitants WHERE name='Kupferfisch'),0,24,27,6.0,7.0),
+(13,(SELECT id FROM inhabitants WHERE name='Roter von Rio'),0,24,28,6.5,7.5),
+(14,(SELECT id FROM inhabitants WHERE name='Schwarzband-Salmler'),0,23,27,6.0,7.0),
+(15,(SELECT id FROM inhabitants WHERE name='Königssalmler'),0,23,27,6.0,7.0),
+(16,(SELECT id FROM inhabitants WHERE name='Feuerschwanz'),0,24,27,6.5,7.5),
+(17,(SELECT id FROM inhabitants WHERE name='Blauer Neon'),0,24,26,5.5,6.5),
+(18,(SELECT id FROM inhabitants WHERE name='Roter Neon'),0,26,28,5.0,6.5),
+(19,(SELECT id FROM inhabitants WHERE name='Schmetterlingsbuntbarsch'),0,26,30,6.0,7.0),
+(20,(SELECT id FROM inhabitants WHERE name='Kakadu-Zwergbuntbarsch'),0,24,28,6.0,7.5),
+(21,(SELECT id FROM inhabitants WHERE name='Zwergfadenfisch'),0,24,28,6.0,7.5),
+(22,(SELECT id FROM inhabitants WHERE name='Marmorierter Panzerwels'),0,22,26,6.5,7.5),
+(23,(SELECT id FROM inhabitants WHERE name='Panda-Panzerwels'),0,22,25,6.0,7.5),
+(24,(SELECT id FROM inhabitants WHERE name='Goldener Panzerwels'),0,22,26,6.0,7.5),
+(25,(SELECT id FROM inhabitants WHERE name='Roter Phantomsalmler'),0,23,27,6.0,7.0),
+(26,(SELECT id FROM inhabitants WHERE name='Schwarzer Phantomsalmler'),0,23,27,6.0,7.0),
+(27,(SELECT id FROM inhabitants WHERE name='Kupferroter Sumatrabarbe'),0,24,27,6.5,7.5),
+(28,(SELECT id FROM inhabitants WHERE name='Sumatrabarbe'),0,24,27,6.5,7.5),
+(29,(SELECT id FROM inhabitants WHERE name='Marmorierter Beilbauchfisch'),0,24,28,6.0,7.0),
+(30,(SELECT id FROM inhabitants WHERE name='Roter Beilbauchfisch'),0,24,28,6.0,7.0),
+(31,(SELECT id FROM inhabitants WHERE name='Zwergkugelfisch'),0,24,28,7.0,7.5),
+(32,(SELECT id FROM inhabitants WHERE name='Zwergbuntbarsch'),0,24,28,6.0,7.5);
+
+
+-- (33,(SELECT id FROM inhabitants WHERE name='Roter Zwergbuntbarsch'),0,24,28,6.0,7.5);
+-- (34,(SELECT id FROM inhabitants WHERE name='Blauer Zwergbuntbarsch'),0,24,28,6.0,7.5);
+-- (35,(SELECT id FROM inhabitants WHERE name='Gelber Zwergbuntbarsch'),0,24,28,6.0,7.5)
+
+-- wasserqualitäten pro wirbellose
+INSERT INTO water_quality (wid, iid, salinity, minTemperature, maxTemperature, minPh, maxPh) VALUES
+(33,(SELECT id FROM inhabitants WHERE name='Rote Posthornschnecke'),0,18,28,6.5,8.0),
+(34,(SELECT id FROM inhabitants WHERE name='Gelbe Posthornschnecke'),0,18,28,6.5,8.0),
+(35,(SELECT id FROM inhabitants WHERE name='Turmdeckelschnecke'),0,20,28,6.5,7.5),
+(36,(SELECT id FROM inhabitants WHERE name='Apfelschnecke'),0,22,28,6.5,8.0),
+(37,(SELECT id FROM inhabitants WHERE name='Blaue Apfelschnecke'),0,22,28,6.5,8.0),
+(38,(SELECT id FROM inhabitants WHERE name='Amano-Garnele'),0,20,27,6.5,7.5),
+(39,(SELECT id FROM inhabitants WHERE name='Rote Zwerggarnele'),0,20,26,6.0,7.5),
+(40,(SELECT id FROM inhabitants WHERE name='Gelbe Zwerggarnele'),0,20,26,6.0,7.5),
+(41,(SELECT id FROM inhabitants WHERE name='Blaue Zwerggarnele'),0,20,26,6.0,7.5),
+(42,(SELECT id FROM inhabitants WHERE name='Bambusgarnele'),0,22,28,6.5,7.5),
+(43,(SELECT id FROM inhabitants WHERE name='Rote Nashorngarnele'),0,22,28,6.5,7.5),
+(44,(SELECT id FROM inhabitants WHERE name='Tiger-Garnele'),0,20,25,6.0,7.2),
+(45,(SELECT id FROM inhabitants WHERE name='Bienen-Garnele'),0,20,25,5.5,6.5),
+(46,(SELECT id FROM inhabitants WHERE name='Rote Rennschnecke'),0,22,28,6.5,8.0),
+(47,(SELECT id FROM inhabitants WHERE name='Zebra-Rennschnecke'),0,22,28,6.5,8.0); 
+
+-- wasserqualitäten pro pflanzen
+INSERT INTO water_quality (wid, iid, salinity, minTemperature, maxTemperature, minPh, maxPh) VALUES
+(48,(SELECT id FROM inhabitants WHERE name='Amazonas-Schwertpflanze'),0,22,28,6.5,7.5),
+(49,(SELECT id FROM inhabitants WHERE name='Kleiner Wasserkelch'),0,22,28,6.0,7.5),
+(50,(SELECT id FROM inhabitants WHERE name='Roter Wasserkelch'),0,22,28,6.0,7.5),
+(51,(SELECT id FROM inhabitants WHERE name='Javafarn'),0,20,28,6.0,7.5),
+(52,(SELECT id FROM inhabitants WHERE name='Javamoos'),0,18,28,5.5,8.0),
+(53,(SELECT id FROM inhabitants WHERE name='Anubias barteri'),0,22,28,6.0,7.5),
+(54,(SELECT id FROM inhabitants WHERE name='Anubias nana'),0,22,28,6.0,7.5),
+(55,(SELECT id FROM inhabitants WHERE name='Vallisneria spiralis'),0,20,28,6.0,8.0),
+(56,(SELECT id FROM inhabitants WHERE name='Rotala rotundifolia'),0,22,28,6.0,7.5),
+(57,(SELECT id FROM inhabitants WHERE name='Ludwigia repens'),0,20,28,6.0,7.5),
+(58,(SELECT id FROM inhabitants WHERE name='Hornkraut'),0,15,30,6.0,7.5),
+(59,(SELECT id FROM inhabitants WHERE name='Wasserpest'),0,15,28,6.5,7.5),
+(60,(SELECT id FROM inhabitants WHERE name='Brasilianisches Tausendblatt'),0,22,28,6.0,7.5),
+(61,(SELECT id FROM inhabitants WHERE name='Kleefarn'),0,20,28,6.0,7.5),
+(62,(SELECT id FROM inhabitants WHERE name='Zwergspeerblatt'),0,22,28,6.0,7.5),
+(63,(SELECT id FROM inhabitants WHERE name='Roter Tigerlotus'),0,22,28,6.5,7.5),
+(64,(SELECT id FROM inhabitants WHERE name='Grüner Tigerlotus'),0,22,28,6.5,7.5),
+(65,(SELECT id FROM inhabitants WHERE name='Bacopa caroliniana'),0,22,28,6.0,7.5),
+(66,(SELECT id FROM inhabitants WHERE name='Bacopa monnieri'),0,22,28,6.0,7.5),
+(67,(SELECT id FROM inhabitants WHERE name='Hygrophila polysperma'),0,20,28,6.0,7.5),
+(68,(SELECT id FROM inhabitants WHERE name='Hygrophila corymbosa'),0,22,28,6.0,7.5),
+(69,(SELECT id FROM inhabitants WHERE name='Lilaeopsis brasiliensis'),0,22,28,6.0,7.5),
+(70,(SELECT id FROM inhabitants WHERE name='Eleocharis parvula'),0,20,28,6.0,7.5),
+(71,(SELECT id FROM inhabitants WHERE name='Eleocharis acicularis'),0,15,26,6.0,7.5),
+(72,(SELECT id FROM inhabitants WHERE name='Hemianthus callitrichoides'),0,22,28,6.0,7.0),
+(73,(SELECT id FROM inhabitants WHERE name='Glossostigma elatinoides'),0,22,28,5.5,7.0),
+(74,(SELECT id FROM inhabitants WHERE name='Riccia fluitans'),0,20,28,6.0,7.5),
+(75,(SELECT id FROM inhabitants WHERE name='Pogostemon helferi'),0,22,28,6.0,7.5),
+(76,(SELECT id FROM inhabitants WHERE name='Pogostemon erectus'),0,22,28,6.0,7.5),
+(77,(SELECT id FROM inhabitants WHERE name='Alternanthera reineckii'),0,22,28,6.0,7.5),
+(79,(SELECT id FROM inhabitants WHERE name='Bucephalandra sp.'),0,22,28,6.0,7.0),
+(81,(SELECT id FROM inhabitants WHERE name='Cryptocoryne parva'),0,22,28,6.0,7.5),
+(82,(SELECT id FROM inhabitants WHERE name='Cryptocoryne undulata'),0,22,28,6.0,7.5),
+(83,(SELECT id FROM inhabitants WHERE name='Cryptocoryne crispatula'),0,22,28,6.0,7.5),
+(84,(SELECT id FROM inhabitants WHERE name='Echinodorus tenellus'),0,22,28,6.5,7.5),
+(85,(SELECT id FROM inhabitants WHERE name='Echinodorus ozelot'),0,22,28,6.5,7.5),
+(86,(SELECT id FROM inhabitants WHERE name='Echinodorus red flame'),0,22,28,6.5,7.5),
+(87,(SELECT id FROM inhabitants WHERE name='Limnophila sessiliflora'),0,22,28,6.0,7.5),
+(88,(SELECT id FROM inhabitants WHERE name='Limnophila aromatica'),0,22,28,6.0,7.5),
+(89,(SELECT id FROM inhabitants WHERE name='Rotala macrandra'),0,22,28,6.0,7.0),
+(90,(SELECT id FROM inhabitants WHERE name='Rotala wallichii'),0,22,28,6.0,7.0),
+(91,(SELECT id FROM inhabitants WHERE name='Rotala indica'),0,22,28,6.0,7.5),
+(92,(SELECT id FROM inhabitants WHERE name='Ludwigia arcuata'),0,22,28,6.0,7.5),
+(93,(SELECT id FROM inhabitants WHERE name='Ludwigia glandulosa'),0,22,28,6.0,7.5),
+(94,(SELECT id FROM inhabitants WHERE name='Proserpinaca palustris'),0,22,28,6.0,7.0),
+(95,(SELECT id FROM inhabitants WHERE name='Tonina fluviatilis'),0,24,28,5.5,6.5),
+(96,(SELECT id FROM inhabitants WHERE name='Myriophyllum tuberculatum'),0,22,28,6.0,7.0),
+(97,(SELECT id FROM inhabitants WHERE name='Cabomba caroliniana'),0,22,28,6.0,7.5);
+
+
+
+
+
+
 
 -- nachher ausführbar mit mysql -u root -p fishbase
 SET FOREIGN_KEY_CHECKS = 1;

@@ -4,4 +4,4 @@ In /server you can run:
 
 ## `node server.js`
 
-Runs the server under localhost:5000
+Runs the server under localhost:3002
