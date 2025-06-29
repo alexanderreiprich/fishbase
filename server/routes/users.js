@@ -96,6 +96,74 @@ router.post('/login', async (req, res) => {
   }
 });
 
+router.post("/search", async (req, res) => {
+  try {
+    console.log("Route /search wurde aufgerufen");
+    const { searchText } = req.body;
+
+    const [users] = await pool.query(
+      "SELECT id, picture, username FROM users WHERE username = ?",
+      [searchText]
+    );
+    if (users.length == 0) {
+      return res
+        .status(404)
+        .json({message: "Keine User gefunden"});
+    }
+
+    // Bilder in Base64 konvertieren
+    const usersWithBase64 = users.map((user) => {
+      const imageBase64 = user.picture
+        ? Buffer.from(user.picture).toString("base64")
+        : null;
+
+      return {
+        ...user,
+        picture: imageBase64,
+      };
+    });
+
+    res.status(200).json(usersWithBase64);
+  } catch (error) {
+    console.error("API-Fehler:", error);
+    res.status(500).json({message: "Serverfehler bei der Abfrage der User"});
+  }
+});
+
+router.get("/all", async (req, res) => {
+  try {
+    console.log("Route /all wurde aufgerufen");
+
+    const [users] = await pool.query(
+      "SELECT id, picture, username FROM users",
+      [searchText]
+    );
+
+    if (users.length == 0) {
+      return res
+        .status(404)
+        .json({message: "Keine User gefunden"});
+    }
+
+    // Bilder in Base64 konvertieren
+    const usersWithBase64 = users.map((user) => {
+      const imageBase64 = user.picture
+        ? Buffer.from(user.picture).toString("base64")
+        : null;
+
+      return {
+        ...user,
+        picture: imageBase64,
+      };
+    });
+
+    res.status(200).json(usersWithBase64);
+  } catch (error) {
+    console.error("API-Fehler:", error);
+    res.status(500).json({message: "Serverfehler bei der Abfrage der User"});
+  }
+});
+
 // Benutzerinformationen abrufen (geschützter Endpunkt)
 router.get('/me', async (req, res) => {
   try {
@@ -125,5 +193,7 @@ router.get('/me', async (req, res) => {
     res.status(401).json({ message: 'Ungültiger Token' });
   }
 });
+
+
 
 module.exports = router; 

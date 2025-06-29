@@ -27,7 +27,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     const fetchUserData = async () => {
       if (token) {
         try {
-          const response = await axios.get('http://localhost:5000/api/users/me', {
+          const response = await axios.get('http://localhost:3002/api/users/me', {
             headers: {
               Authorization: `Bearer ${token}`
             }
@@ -49,7 +49,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     try {
       setLoading(true);
       setError(null);
-      const response = await axios.post('http://localhost:5000/api/users/login', {
+      const response = await axios.post('http://localhost:3002/api/users/login', {
         email,
         password
       });
@@ -70,7 +70,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     try {
       setLoading(true);
       setError(null);
-      const response = await axios.post('http://localhost:5000/api/users/register', {
+      const response = await axios.post('http://localhost:3002/api/users/register', {
         username,
         email,
         password

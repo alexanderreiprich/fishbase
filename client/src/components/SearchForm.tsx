@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import {
   Box,
   Paper,
@@ -20,11 +20,12 @@ import { SearchOptions } from '../interfaces/SearchOptions';
 
 interface SearchFormProps {
   onSearch: (searchParams: SearchOptions) => void;
+  lastSearchParams?: SearchOptions;
 }
 
-export const SearchForm: React.FC<SearchFormProps> = ({ onSearch }) => {
+export const SearchForm: React.FC<SearchFormProps> = ({ onSearch, lastSearchParams }) => {
   const [search, setSearch] = useState('');
-  const [showAdvanced, setShowAdvanced] = useState(true);
+  const [showAdvanced, setShowAdvanced] = useState(false);
   const [type, setType] = useState<InhabitantType | ''>('');
   const [habitat, setHabitat] = useState('');
   const [color, setColor] = useState('');
@@ -33,6 +34,29 @@ export const SearchForm: React.FC<SearchFormProps> = ({ onSearch }) => {
   const [temperature, setTemperature] = useState('');
 
   const typeStrings = ["fish", "invertebrate", "plant"];
+
+  // Wiederherstellen der letzten Suchparameter
+  useEffect(() => {
+    if (lastSearchParams) {
+      setSearch(lastSearchParams.searchText || '');
+      setType(lastSearchParams.type ? 
+        (lastSearchParams.type === 'fish' ? InhabitantType.FISH : 
+         lastSearchParams.type === 'invertebrate' ? InhabitantType.INVERTEBRATE : 
+         InhabitantType.PLANT) : '');
+      setHabitat(lastSearchParams.habitat || '');
+      setColor(lastSearchParams.color || '');
+      setSalinity(lastSearchParams.salinity?.toString() || '');
+      setPhValue(lastSearchParams.phValue?.toString() || '');
+      setTemperature(lastSearchParams.temperature?.toString() || '');
+      
+      // Erweiterte Suche anzeigen, wenn erweiterte Parameter verwendet wurden
+      if (lastSearchParams.habitat || lastSearchParams.color || 
+          lastSearchParams.salinity || lastSearchParams.phValue || 
+          lastSearchParams.temperature || lastSearchParams.type) {
+        setShowAdvanced(true);
+      }
+    }
+  }, [lastSearchParams]);
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
