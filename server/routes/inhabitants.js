@@ -94,7 +94,7 @@ router.post("/search", async (req, res) => {
         if (inhabitants.length == 0) {
           // 4. Fuzzy-Search und Stem-Search aktivieren
           return res
-            .status(400)
+            .status(404)
             .json({ message: "Spezies wurde nicht gefunden" });
         }
       }

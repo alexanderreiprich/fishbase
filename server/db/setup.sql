@@ -292,9 +292,9 @@ INSERT INTO terms (term, oid) VALUES
   ('Gelber Zwergbuntbarsch', 7),
   ('Roter Zwergbuntbarsch', 7);
 
-  DROP TABLE IF EXISTS water_quality;
+DROP TABLE IF EXISTS water_quality;
 
-  -- wasserqualitäten, wird referenziert von habitat
+-- wasserqualitäten, wird referenziert von habitat
 CREATE TABLE water_quality (
   wid SMALLINT,
   iid SMALLINT,

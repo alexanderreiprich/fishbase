@@ -1,5 +1,3 @@
-import { InhabitantType } from "./InhabitantType";
-
 export interface SearchOptions {
 	searchText: string | null,
 	type: string | null,

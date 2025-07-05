@@ -13,29 +13,14 @@ import { InhabitantType } from "../interfaces/InhabitantType";
 const SearchPage: React.FC = () => {
   const [animals, setAnimals] = useState<Animal[]>([]);
   const [plants, setPlants] = useState<Plant[]>([]);
-  const [loading, setLoading] = useState(true);
-
-  useEffect(() => {
-    const loadMockData = async () => {
-      try {
-        const mockdata = new MockData();
-        const [animal, plant] = await Promise.all([
-          mockdata.getMockAnimal(),
-          mockdata.getMockPlant()
-        ]);
-        setAnimals([animal]);
-        setPlants([plant]);
-      } catch (error) {
-        console.error('Fehler beim Laden der Mock-Daten:', error);
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    loadMockData();
-  }, []);
+  const [loading, setLoading] = useState(false);
+  const [hasSearched, setHasSearched] = useState(false);
+  const [lastSearchParams, setLastSearchParams] = useState<SearchOptions | undefined>(undefined);
 
   const handleSearch = async (searchParams: SearchOptions) => {
+    setLoading(true);
+    setHasSearched(true);
+    setLastSearchParams(searchParams);
     const repository = InhabitantRepository.getInstance();
     const data = await repository.getInhabitants(searchParams);
 
@@ -58,6 +43,7 @@ const SearchPage: React.FC = () => {
 
     setAnimals(animals);
     setPlants(plants);
+    setLoading(false);
   };
 
   if (loading) {
@@ -66,29 +52,48 @@ const SearchPage: React.FC = () => {
 
   return (
     <Box sx={{ p: 3 }}>
-      <SearchForm onSearch={handleSearch} />
+      <SearchForm onSearch={handleSearch} lastSearchParams={lastSearchParams}/>
       
-      <Typography variant="h6" gutterBottom sx={{ mt: 4 }}>
-        Gefundene Tiere
-      </Typography>
-      <Grid container spacing={3}>
-        {animals.map((animal, index) => (
-          <Grid size={{ xs: 12, sm: 6, md: 4 }} key={index}>
-            <AnimalCard animal={animal} />
-          </Grid>
-        ))}
-      </Grid>
+      {hasSearched && animals.length === 0 && plants.length === 0 && (
+        <Box sx={{ mt: 4, textAlign: 'center' }}>
+          <Typography variant="h6" gutterBottom>
+            Keine Ergebnisse gefunden.
+          </Typography>
+          <Typography variant="body1">
+            Versuchen Sie andere Suchkriterien oder erweitern Sie Ihre Suche.
+          </Typography>
+        </Box>
+      )}
 
-      <Typography variant="h6" gutterBottom sx={{ mt: 4 }}>
-        Gefundene Pflanzen
-      </Typography>
-      <Grid container spacing={3}>
-        {plants.map((plant, index) => (
-          <Grid size={{ xs: 12, sm: 6, md: 4 }} key={index}>
-            <PlantCard plant={plant} />
+      {animals.length > 0 && (
+        <>
+          <Typography variant="h6" gutterBottom sx={{ mt: 4 }}>
+            Gefundene Tiere
+          </Typography>
+          <Grid container spacing={3}>
+            {animals.map((animal, index) => (
+              <Grid size={{ xs: 12, sm: 6, md: 4 }} key={index}>
+                <AnimalCard animal={animal} />
+              </Grid>
+            ))}
           </Grid>
-        ))}
-      </Grid>
+        </>
+      )}
+
+      {plants.length > 0 && (
+        <>
+          <Typography variant="h6" gutterBottom sx={{ mt: 4 }}>
+            Gefundene Pflanzen
+          </Typography>
+          <Grid container spacing={3}>
+            {plants.map((plant, index) => (
+              <Grid size={{ xs: 12, sm: 6, md: 4 }} key={index}>
+                <PlantCard plant={plant} />
+              </Grid>
+            ))}
+          </Grid>
+        </>
+      )}
     </Box>
   );
 };

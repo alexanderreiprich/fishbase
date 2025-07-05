@@ -12,7 +12,7 @@ export default function ProfilePicture(){
 
   return (
     <img
-      src={user?.profile_image || "/images/default_profile_image.png"}
+      src={user?.profile_image ? URL.createObjectURL(user?.profile_image) : "/images/default_profile_image.png"}
       alt="Profilbild"
       className="profile-picture"
       onClick={handleClick}

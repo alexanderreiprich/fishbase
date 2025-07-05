@@ -5,20 +5,21 @@ import CssBaseline from "@mui/material/CssBaseline";
 import { AuthProvider, useAuth } from "./context/AuthContext";
 import LoginForm from "./components/LoginForm";
 import RegisterForm from "./components/RegisterForm";
-import ProfilePage from "./pages/ProfilePage";
+import PersonalProfilePage from "./pages/PersonalProfilePage";
 import theme from "./theme";
 import Home from "./pages/Home";
 import Header from "./components/Header";
 import SearchPage from "./pages/SearchPage";
 import ListPage from "./pages/ListPage";
 import CommunityPage from "./pages/CommunityPage";
+import ProfilePage from "./pages/ProfilePage";
 
 const ProtectedRoute: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const { user } = useAuth();
   
-  // if (!user) {
-  //   return <Navigate to="/login" />;
-  // }
+  if (!user) {
+    return <Navigate to="/login" />;
+  }
 
   return (
     <>
@@ -45,11 +46,19 @@ function App() {
                 </ProtectedRoute>
               }
             />
+            <Route 
+              path="/users/profile/:userId"
+              element={
+                <ProtectedRoute>
+                  <ProfilePage />
+                </ProtectedRoute>
+              }
+            />
             <Route
               path="/profile"
               element={
                 <ProtectedRoute>
-                  <ProfilePage />
+                  <PersonalProfilePage />
                 </ProtectedRoute>
               }
             />

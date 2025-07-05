@@ -21,7 +21,7 @@ interface ApiInhabitant {
 
 export class InhabitantRepository {
   private static instance: InhabitantRepository;
-  private readonly baseUrl: string = 'http://localhost:5000/api/inhabitants';
+  private readonly baseUrl: string = 'http://localhost:3002/api/inhabitants';
 
   private constructor() {}
 
@@ -51,7 +51,10 @@ export class InhabitantRepository {
         },
         body: JSON.stringify(searchOptions)
       });
-      if (!response.ok) {
+      if (response.status == 404) {
+        return [];
+      }
+      else if (!response.ok) {
         throw new Error('Fehler beim Abrufen der Daten');
       }
       const data: ApiInhabitant[] = await response.json();
