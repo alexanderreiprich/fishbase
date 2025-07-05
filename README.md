@@ -14,7 +14,7 @@ An app where you can build aquariums and share them with others.
 3. Navigate to server/db/ and run `mysql -u root -p fishbase < setup.sql`
    you might have to remove 'fishbase' from command to create the database
 4. Make sure the created database is running
-   by logging into mysql `mysql -uroot -p`
+   by logging into mysql `mysql -u root -p`
    and entering SHOW PROCESSLIST you can check if fishbase exists
 5. Navigate to server/db/ and edit the database details inside insertImages.js
 6. Execute insertImages.js by running `node insertImages.js` to convert the images to blobs and store them in the database
