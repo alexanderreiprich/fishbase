@@ -1,0 +1,30 @@
+.profile-picture-upload-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+}
+
+.profile-picture-upload-button {
+  background-color: var(--primary-main);
+  transition: background-color 0.3s ease;
+	color: var(--text-primary);
+}
+
+.profile-picture-upload-button:hover {
+  background-color: var(--primary-dark);
+}
+
+.profile-picture-upload-button:disabled {
+  background-color: #ccc !important;
+}
+
+.profile-picture-upload-error {
+  text-align: center;
+  color: #d32f2f;
+  font-size: 0.875rem;
+}
+
+.profile-picture-upload-input {
+  display: none;
+} 

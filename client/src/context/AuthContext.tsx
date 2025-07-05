@@ -94,6 +94,21 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     setUser(null);
   };
 
+  const refreshUserData = async () => {
+    if (token) {
+      try {
+        const response = await axios.get('http://localhost:3002/api/users/me', {
+          headers: {
+            Authorization: `Bearer ${token}`
+          }
+        });
+        setUser(response.data);
+      } catch (err) {
+        console.error('Error refreshing user information:', err);
+      }
+    }
+  };
+
   const value = {
     user,
     token,
@@ -101,6 +116,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     login,
     register,
     logout,
+    refreshUserData,
     loading,
     error
   };

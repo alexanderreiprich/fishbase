@@ -69,7 +69,20 @@ const ProfilePage: React.FC = () => {
           <Box className="profile-image-container">
             <img
               className="profile-image"
-              src={user?.profile_image ? URL.createObjectURL(user?.profile_image) : "/images/default_profile_image.png"}
+              src={user?.picture ? (() => {
+                if (typeof user.picture === 'string') {
+                  // Base64-String zu Blob konvertieren
+                  const byteCharacters = atob(user.picture);
+                  const byteNumbers = new Array(byteCharacters.length);
+                  for (let i = 0; i < byteCharacters.length; i++) {
+                    byteNumbers[i] = byteCharacters.charCodeAt(i);
+                  }
+                  const byteArray = new Uint8Array(byteNumbers);
+                  const blob = new Blob([byteArray], { type: 'image/jpeg' });
+                  return URL.createObjectURL(blob);
+                }
+                return URL.createObjectURL(user.picture);
+              })() : "/images/default_profile_image.png"}
               alt="Profilbild"
             />
             <Box>
@@ -87,6 +100,32 @@ const ProfilePage: React.FC = () => {
               Aquariums
             </Typography>
           </Box>
+          
+          {user?.aquarium && (
+            <Box className="aquarium-section">
+              <Typography variant="h4" component="h4" className="aquarium-title">
+                Mein Aquarium
+              </Typography>
+              <img
+                className="aquarium-image"
+                src={(() => {
+                  if (typeof user.aquarium === 'string') {
+                    // Base64-String zu Blob konvertieren
+                    const byteCharacters = atob(user.aquarium);
+                    const byteNumbers = new Array(byteCharacters.length);
+                    for (let i = 0; i < byteCharacters.length; i++) {
+                      byteNumbers[i] = byteCharacters.charCodeAt(i);
+                    }
+                    const byteArray = new Uint8Array(byteNumbers);
+                    const blob = new Blob([byteArray], { type: 'image/jpeg' });
+                    return URL.createObjectURL(blob);
+                  }
+                  return URL.createObjectURL(user.aquarium);
+                })()}
+                alt="Aquarium"
+              />
+            </Box>
+          )}
         </Box>
       </Paper>
     </Box>
