@@ -3,5 +3,6 @@ export interface User {
   username: string;
   email: string;
   profile_image: Blob | null;
-  bio: string;
+  favorite_fish: number | null;
+  aquarium_image: Blob | null;
 }

@@ -5,6 +5,8 @@ interface ApiUser {
 	id: number;
 	picture: Blob;
 	username: string;
+	aquarium: Blob;
+	favorite_fish: number;
 }
 
 export class UserRepository {
@@ -28,6 +30,20 @@ export class UserRepository {
         'Expires': '0'
       }
     };
+	}
+
+	public async getUserById(id: number): Promise<User> {
+		try {
+			const response = await fetch(`${this.baseUrl}/profile/${id}`, this.getFetchOptions());
+			if (!response.ok) {
+				throw new Error('Fehler beim Abrufen der Daten');
+			}
+			const data: ApiUser = await response.json();
+			return this.transformToUser(data);
+		} catch (error) {
+			console.error('Fehler beim Abrufen der User:', error);
+			throw error;
+		}
 	}
 
 	public async getUsers(searchOptions: SearchOptions): Promise<User[]> {
@@ -78,6 +94,10 @@ export class UserRepository {
 		const cleanedUser = {
 			id: apiData.id,
 			username: apiData.username,
+			favorite_fish: apiData.favorite_fish,
+			aquarium_image: apiData.aquarium && typeof apiData.aquarium === "object" && "data" in apiData.aquarium // Checks if this is a Buffer object that contains the image
+			? new Blob([new Uint8Array((apiData.aquarium as any).data)], { type: 'image/jpeg' }) // Creates a blob from the buffer object
+			: null,
 			profile_image: apiData.picture && typeof apiData.picture === "object" && "data" in apiData.picture // Checks if this is a Buffer object that contains the image
 			? new Blob([new Uint8Array((apiData.picture as any).data)], { type: 'image/jpeg' }) // Creates a blob from the buffer object
 			: null,

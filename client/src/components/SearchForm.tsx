@@ -15,7 +15,7 @@ import {
   ToggleButtonGroup,
 } from '@mui/material';
 import { InhabitantType } from '../interfaces/InhabitantType';
-import './SearchForm.css';
+import '../style/SearchForm.css';
 import { SearchOptions } from '../interfaces/SearchOptions';
 
 interface SearchFormProps {

@@ -102,8 +102,8 @@ router.post("/search", async (req, res) => {
     const { searchText } = req.body;
 
     const [users] = await pool.query(
-      "SELECT id, picture, username FROM users WHERE username = ?",
-      [searchText]
+      "SELECT id, picture, username, favoritefish, aquarium FROM users WHERE username LIKE ?",
+      [`%${searchText}%`]
     );
     if (users.length == 0) {
       return res
@@ -117,9 +117,14 @@ router.post("/search", async (req, res) => {
         ? Buffer.from(user.picture).toString("base64")
         : null;
 
+      const aquariumBase64 = user.aquarium
+        ? Buffer.from(user.aquarium).toString("base64")
+        : null;
+
       return {
         ...user,
         picture: imageBase64,
+        aquarium: aquariumBase64,
       };
     });
 
@@ -158,6 +163,41 @@ router.get("/all", async (req, res) => {
     });
 
     res.status(200).json(usersWithBase64);
+  } catch (error) {
+    console.error("API-Fehler:", error);
+    res.status(500).json({message: "Serverfehler bei der Abfrage der User"});
+  }
+});
+
+router.get("/profile/:id", async (req, res) => {
+  try {
+    const { id } = req.params;
+    console.log(`Route users/:id wurde aufgerufen mit ID: ${id}`);
+    const [users] = await pool.query(
+      "SELECT * FROM users WHERE id = ?",
+      [id]
+    );
+
+    if (users.length === 0) {
+      return res.status(404).json({ message: "User nicht gefunden" });
+    }
+
+    // Bild in Base64 konvertieren
+    const imageBase64 = users[0].picture
+      ? Buffer.from(users[0].picture).toString("base64")
+      : null;
+
+    const aquariumBase64 = users[0].aquarium
+      ? Buffer.from(users[0].aquarium).toString("base64")
+      : null;
+
+    const user = {
+      ...users[0],
+      picture: imageBase64,
+      aquarium: aquariumBase64,
+    };
+
+    res.status(200).json(user);
   } catch (error) {
     console.error("API-Fehler:", error);
     res.status(500).json({message: "Serverfehler bei der Abfrage der User"});
