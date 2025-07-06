@@ -48,3 +48,28 @@
 .profile-subheader-text {
   color: var(--text-primary);
 }
+
+.aquarium-section {
+  margin-top: 1.5rem;
+  text-align: center;
+}
+
+.aquarium-title {
+  margin-bottom: 1rem;
+  color: var(--text-primary);
+}
+
+.aquarium-image {
+  max-width: 100%;
+  max-height: 400px;
+  border-radius: 8px;
+  box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+  object-fit: cover;
+}
+
+.upload-buttons-container {
+  margin-top: 1rem;
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}

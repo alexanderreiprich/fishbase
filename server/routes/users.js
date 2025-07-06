@@ -204,6 +204,95 @@ router.get("/profile/:id", async (req, res) => {
   }
 });
 
+// Profilbild aktualisieren
+router.put("/profile/picture", async (req, res) => {
+  try {
+    const token = req.header('Authorization')?.replace('Bearer ', '');
+    
+    if (!token) {
+      return res.status(401).json({ message: 'Keine Authentifizierung' });
+    }
+
+    const decoded = jwt.verify(token, process.env.JWT_SECRET);
+    const { picture } = req.body;
+
+    if (!picture) {
+      return res.status(400).json({ message: 'Kein Bild übermittelt' });
+    }
+
+    // Base64 zu Buffer konvertieren
+    const imageBuffer = Buffer.from(picture, 'base64');
+
+    // Bild in der Datenbank aktualisieren
+    await pool.query(
+      'UPDATE users SET picture = ? WHERE id = ?',
+      [imageBuffer, decoded.userId]
+    );
+
+    res.json({ message: 'Profilbild erfolgreich aktualisiert' });
+  } catch (error) {
+    console.error('Fehler beim Aktualisieren des Profilbilds:', error);
+    res.status(500).json({ message: 'Serverfehler beim Aktualisieren des Profilbilds' });
+  }
+});
+
+// Aquarium-Bild aktualisieren
+router.put("/profile/aquarium", async (req, res) => {
+  try {
+    const token = req.header('Authorization')?.replace('Bearer ', '');
+    
+    if (!token) {
+      return res.status(401).json({ message: 'Keine Authentifizierung' });
+    }
+
+    const decoded = jwt.verify(token, process.env.JWT_SECRET);
+    const { aquarium } = req.body;
+
+    if (!aquarium) {
+      return res.status(400).json({ message: 'Kein Bild übermittelt' });
+    }
+
+    // Base64 zu Buffer konvertieren
+    const imageBuffer = Buffer.from(aquarium, 'base64');
+
+    // Bild in der Datenbank aktualisieren
+    await pool.query(
+      'UPDATE users SET aquarium = ? WHERE id = ?',
+      [imageBuffer, decoded.userId]
+    );
+
+    res.json({ message: 'Aquarium-Bild erfolgreich aktualisiert' });
+  } catch (error) {
+    console.error('Fehler beim Aktualisieren des Aquarium-Bildes:', error);
+    res.status(500).json({ message: 'Serverfehler beim Aktualisieren des Aquarium-Bildes' });
+  }
+});
+
+// Lieblingsfisch aktualisieren
+router.put("/profile/favoritefish", async (req, res) => {
+  try {
+    const token = req.header('Authorization')?.replace('Bearer ', '');
+    
+    if (!token) {
+      return res.status(401).json({ message: 'Keine Authentifizierung' });
+    }
+
+    const decoded = jwt.verify(token, process.env.JWT_SECRET);
+    const { favoritefish } = req.body;
+
+    // Lieblingsfisch in der Datenbank aktualisieren
+    await pool.query(
+      'UPDATE users SET favoritefish = ? WHERE id = ?',
+      [favoritefish, decoded.userId]
+    );
+
+    res.json({ message: 'Lieblingsfisch erfolgreich aktualisiert' });
+  } catch (error) {
+    console.error('Fehler beim Aktualisieren des Lieblingsfisches:', error);
+    res.status(500).json({ message: 'Serverfehler beim Aktualisieren des Lieblingsfisches' });
+  }
+});
+
 // Benutzerinformationen abrufen (geschützter Endpunkt)
 router.get('/me', async (req, res) => {
   try {
@@ -227,7 +316,22 @@ router.get('/me', async (req, res) => {
       return res.status(404).json({ message: 'Benutzer nicht gefunden' });
     }
 
-    res.json(users[0]);
+    // Bild in Base64 konvertieren
+    const imageBase64 = users[0].picture
+      ? Buffer.from(users[0].picture).toString("base64")
+      : null;
+
+    const aquariumBase64 = users[0].aquarium
+      ? Buffer.from(users[0].aquarium).toString("base64")
+      : null;
+
+    const user = {
+      ...users[0],
+      picture: imageBase64,
+      aquarium: aquariumBase64,
+    };
+
+    res.json(user);
   } catch (error) {
     console.error('Fehler beim Abrufen der Benutzerinformationen:', error);
     res.status(401).json({ message: 'Ungültiger Token' });

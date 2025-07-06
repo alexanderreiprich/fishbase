@@ -16,7 +16,7 @@ export default function UserCard({ user }: { user: User }) {
   return (
     <Card variant="outlined">
       <CardMedia
-        image={user.profile_image ? URL.createObjectURL(user.profile_image) : "/images/default_profile_image.png"}
+        image={user.picture ? URL.createObjectURL(user.picture) : "/images/default_profile_image.png"}
         title={user.username}
         sx={{ height: 140 }}
       />

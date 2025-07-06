@@ -1,0 +1,30 @@
+.aquarium-upload-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+}
+
+.aquarium-upload-button {
+  background-color: var(--primary-main);
+  transition: background-color 0.3s ease;
+  color: var(--text-primary);
+}
+
+.aquarium-upload-button:hover {
+  background-color: var(--primary-dark);
+}
+
+.aquarium-upload-button:disabled {
+  background-color: #ccc !important;
+}
+
+.aquarium-upload-error {
+  text-align: center;
+  color: #d32f2f;
+  font-size: 0.875rem;
+}
+
+.aquarium-upload-input {
+  display: none;
+} 

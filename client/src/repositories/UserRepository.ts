@@ -3,10 +3,10 @@ import { User } from "../interfaces/User";
 
 interface ApiUser {
 	id: number;
-	picture: Blob;
+	picture: { type: "Buffer", data: number[] } | string | null;
 	username: string;
-	aquarium: Blob;
-	favorite_fish: number;
+	aquarium: { type: "Buffer", data: number[] } | string | null;
+	favoritefish: number;
 }
 
 export class UserRepository {
@@ -90,21 +90,93 @@ export class UserRepository {
 		}
 	}
 
+	public async updateProfilePicture(picture: File): Promise<void> {
+		try {
+			// Bild zu Base64 konvertieren
+			const base64 = await this.fileToBase64(picture);
+			
+			const token = localStorage.getItem('token');
+			const response = await fetch(`${this.baseUrl}/profile/picture`, {
+				method: 'PUT',
+				headers: {
+					'Content-Type': 'application/json',
+					'Authorization': `Bearer ${token}`
+				},
+				body: JSON.stringify({ picture: base64 })
+			});
+
+			if (!response.ok) {
+				throw new Error('Fehler beim Aktualisieren des Profilbilds');
+			}
+		} catch (error) {
+			console.error('Fehler beim Aktualisieren des Profilbilds:', error);
+			throw error;
+		}
+	}
+
+	public async updateFavoriteFish(favoriteFishId: number | null): Promise<void> {
+		try {
+			const token = localStorage.getItem('token');
+			const response = await fetch(`${this.baseUrl}/profile/favoritefish`, {
+				method: 'PUT',
+				headers: {
+					'Content-Type': 'application/json',
+					'Authorization': `Bearer ${token}`
+				},
+				body: JSON.stringify({ favoritefish: favoriteFishId })
+			});
+
+			if (!response.ok) {
+				throw new Error('Fehler beim Aktualisieren des Lieblingsfisches');
+			}
+		} catch (error) {
+			console.error('Fehler beim Aktualisieren des Lieblingsfisches:', error);
+			throw error;
+		}
+	}
+
+	private fileToBase64(file: File): Promise<string> {
+		return new Promise((resolve, reject) => {
+			const reader = new FileReader();
+			reader.readAsDataURL(file);
+			reader.onload = () => {
+				const result = reader.result as string;
+				// Entferne den "data:image/...;base64," Prefix
+				const base64 = result.split(',')[1];
+				resolve(base64);
+			};
+			reader.onerror = error => reject(error);
+		});
+	}
+
 	private async transformToUser(apiData: ApiUser): Promise<User> {
 		const cleanedUser = {
 			id: apiData.id,
 			username: apiData.username,
-			favorite_fish: apiData.favorite_fish,
-			aquarium_image: apiData.aquarium && typeof apiData.aquarium === "object" && "data" in apiData.aquarium // Checks if this is a Buffer object that contains the image
-			? new Blob([new Uint8Array((apiData.aquarium as any).data)], { type: 'image/jpeg' }) // Creates a blob from the buffer object
-			: null,
-			profile_image: apiData.picture && typeof apiData.picture === "object" && "data" in apiData.picture // Checks if this is a Buffer object that contains the image
-			? new Blob([new Uint8Array((apiData.picture as any).data)], { type: 'image/jpeg' }) // Creates a blob from the buffer object
-			: null,
+			favoritefish: apiData.favoritefish,
+			aquarium: apiData.aquarium ? this.toBlob(apiData.aquarium) : null,
+			picture: apiData.picture ? this.toBlob(apiData.picture) : null,
 			email: "",
 			bio: ""
 		};
 		return cleanedUser;
+	}
+
+	private toBlob(data: { type: "Buffer", data: number[] } | string): Blob {
+		if (typeof data === 'string') {
+			// Base64-String zu Blob
+			const byteCharacters = atob(data);
+			const byteNumbers = new Array(byteCharacters.length);
+			for (let i = 0; i < byteCharacters.length; i++) {
+				byteNumbers[i] = byteCharacters.charCodeAt(i);
+			}
+			const byteArray = new Uint8Array(byteNumbers);
+			return new Blob([byteArray], { type: 'image/jpeg' });
+		} else {
+			// Buffer-Objekt zu Blob
+			const byteArray = new Uint8Array(data.data);
+			return new Blob([byteArray], { type: 'image/jpeg' });
+		}
 	}
 
 }
