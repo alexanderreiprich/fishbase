@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { Typography, Paper, Box } from "@mui/material";
 import { useAuth } from "../context/AuthContext";
 import { Navigate } from "react-router-dom";
@@ -6,15 +6,15 @@ import LogoutButton from "../components/LogoutButton";
 import ProfilePictureUpload from "../components/ProfilePictureUpload";
 import AquariumUpload from "../components/AquariumUpload";
 import "../style/ProfilePage.css";
+import { InhabitantRepository } from "../repositories/InhabitantRepository";
+import { Inhabitant } from "../interfaces/Inhabitant";
 
 const PersonalProfilePage: React.FC = () => {
   const { user, isAuthenticated, refreshUserData } = useAuth();
   const [refreshKey, setRefreshKey] = useState(0);
+  const [ favFish, setFavFish ] = useState<Inhabitant | null>(null);
 
-  // Redirect to login page if user is not authenticated
-  if (!isAuthenticated) {
-    return <Navigate to="/login" replace />;
-  }
+  const inhabitantRepository: InhabitantRepository = InhabitantRepository.getInstance();
 
   const handlePictureUpdated = async () => {
     await refreshUserData();
@@ -25,6 +25,23 @@ const PersonalProfilePage: React.FC = () => {
     await refreshUserData();
     setRefreshKey(prev => prev + 1);
   };
+
+  useEffect(() => {
+    if (user?.favoritefish) {
+      fetchFavoriteFish();
+    }
+  }, [user?.favoritefish]);
+
+  const fetchFavoriteFish = async () => {
+    const id: number = user?.favoritefish!;
+    const inhabitant: Inhabitant = await inhabitantRepository.getInhabitantById(id);
+    setFavFish(inhabitant);
+  }
+
+  // Redirect to login page if user is not authenticated
+  if (!isAuthenticated) {
+    return <Navigate to="/login" replace />;
+  }
 
   return (
     <Box className="profile-container">
@@ -96,7 +113,17 @@ const PersonalProfilePage: React.FC = () => {
             </Box>
           )}
         </Box>
-
+        {user?.favoritefish && (
+          <Box className="favorite-fish-section">
+            <Typography variant="h4" component="h4" className="favorite-fish-title">
+              Mein Lieblingsfisch
+            </Typography>
+            <Typography variant="h5" component="h5" className="favorite-fish">
+              {favFish?.name}
+            </Typography>
+            
+          </Box>
+        )}
         <Box sx={{ mt: 4 }}>
           <LogoutButton />
         </Box>

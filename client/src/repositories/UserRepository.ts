@@ -6,7 +6,7 @@ interface ApiUser {
 	picture: { type: "Buffer", data: number[] } | string | null;
 	username: string;
 	aquarium: { type: "Buffer", data: number[] } | string | null;
-	favorite_fish: number;
+	favoritefish: number;
 }
 
 export class UserRepository {
@@ -114,6 +114,27 @@ export class UserRepository {
 		}
 	}
 
+	public async updateFavoriteFish(favoriteFishId: number | null): Promise<void> {
+		try {
+			const token = localStorage.getItem('token');
+			const response = await fetch(`${this.baseUrl}/profile/favoritefish`, {
+				method: 'PUT',
+				headers: {
+					'Content-Type': 'application/json',
+					'Authorization': `Bearer ${token}`
+				},
+				body: JSON.stringify({ favoritefish: favoriteFishId })
+			});
+
+			if (!response.ok) {
+				throw new Error('Fehler beim Aktualisieren des Lieblingsfisches');
+			}
+		} catch (error) {
+			console.error('Fehler beim Aktualisieren des Lieblingsfisches:', error);
+			throw error;
+		}
+	}
+
 	private fileToBase64(file: File): Promise<string> {
 		return new Promise((resolve, reject) => {
 			const reader = new FileReader();
@@ -132,7 +153,7 @@ export class UserRepository {
 		const cleanedUser = {
 			id: apiData.id,
 			username: apiData.username,
-			favoritefish: apiData.favorite_fish,
+			favoritefish: apiData.favoritefish,
 			aquarium: apiData.aquarium ? this.toBlob(apiData.aquarium) : null,
 			picture: apiData.picture ? this.toBlob(apiData.picture) : null,
 			email: "",

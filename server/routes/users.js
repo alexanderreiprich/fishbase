@@ -268,6 +268,31 @@ router.put("/profile/aquarium", async (req, res) => {
   }
 });
 
+// Lieblingsfisch aktualisieren
+router.put("/profile/favoritefish", async (req, res) => {
+  try {
+    const token = req.header('Authorization')?.replace('Bearer ', '');
+    
+    if (!token) {
+      return res.status(401).json({ message: 'Keine Authentifizierung' });
+    }
+
+    const decoded = jwt.verify(token, process.env.JWT_SECRET);
+    const { favoritefish } = req.body;
+
+    // Lieblingsfisch in der Datenbank aktualisieren
+    await pool.query(
+      'UPDATE users SET favoritefish = ? WHERE id = ?',
+      [favoritefish, decoded.userId]
+    );
+
+    res.json({ message: 'Lieblingsfisch erfolgreich aktualisiert' });
+  } catch (error) {
+    console.error('Fehler beim Aktualisieren des Lieblingsfisches:', error);
+    res.status(500).json({ message: 'Serverfehler beim Aktualisieren des Lieblingsfisches' });
+  }
+});
+
 // Benutzerinformationen abrufen (geschützter Endpunkt)
 router.get('/me', async (req, res) => {
   try {

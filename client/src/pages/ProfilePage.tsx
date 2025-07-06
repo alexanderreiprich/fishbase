@@ -4,6 +4,8 @@ import { useParams } from "react-router-dom";
 import "../style/ProfilePage.css";
 import { User } from "../interfaces/User";
 import { UserRepository } from "../repositories/UserRepository";
+import { Inhabitant } from "../interfaces/Inhabitant";
+import { InhabitantRepository } from "../repositories/InhabitantRepository";
 
 const ProfilePage: React.FC = () => {
   const { userId } = useParams<{ userId: string }>();
@@ -11,6 +13,9 @@ const ProfilePage: React.FC = () => {
   const [user, setUser] = useState<User | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [ favFish, setFavFish ] = useState<Inhabitant | null>(null);
+
+  const inhabitantRepository: InhabitantRepository = InhabitantRepository.getInstance();
 
   useEffect(() => {
     const fetchUser = async () => {
@@ -29,6 +34,22 @@ const ProfilePage: React.FC = () => {
 
     fetchUser();
   }, [user_id]);
+
+  useEffect(() => {
+    if (user?.favoritefish) {
+      fetchFavoriteFish();
+    }
+  }, [user?.favoritefish]);
+
+  const fetchFavoriteFish = async () => {
+    const id: number = user?.favoritefish!;
+    try {
+      const inhabitant: Inhabitant = await inhabitantRepository.getInhabitantById(id);
+      setFavFish(inhabitant);
+    } catch (error) {
+      console.error("Fehler beim Laden des Lieblingsfisches:", error);
+    }
+  }
 
   if (loading) {
     return (
@@ -126,6 +147,16 @@ const ProfilePage: React.FC = () => {
               />
             </Box>
           )}
+          {user?.favoritefish && (
+          <Box className="favorite-fish-section">
+            <Typography variant="h4" component="h4" className="favorite-fish-title">
+              Mein Lieblingsfisch
+            </Typography>
+            <Typography variant="h5" component="h5" className="favorite-fish">
+              {favFish?.name}
+            </Typography>
+          </Box>
+        )}
         </Box>
       </Paper>
     </Box>

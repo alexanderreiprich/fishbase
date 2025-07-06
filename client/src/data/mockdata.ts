@@ -38,6 +38,7 @@ export class MockData {
   public async getMockAnimal(): Promise<Animal> {
     const [animalBlob] = await this.fetchImages();
     const x: Animal = {
+      id: 0,
       type: InhabitantType.FISH,
       length: 213,
       food: "cheeseburger",
@@ -61,6 +62,7 @@ export class MockData {
   public async getMockPlant(): Promise<Plant> {
     const [, plantBlob] = await this.fetchImages();
     const x: Plant = {
+      id: 1,
       type: InhabitantType.PLANT,
       minHeight: 23,
       maxHeight: 23,

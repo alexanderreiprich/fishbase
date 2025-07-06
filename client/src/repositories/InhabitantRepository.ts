@@ -88,8 +88,24 @@ export class InhabitantRepository {
     }
   }
 
+  public async getInhabitantById(id: number): Promise<Animal | Plant> {
+    try {
+      const response = await fetch(`${this.baseUrl}/${id}`, this.getFetchOptions());
+      if (!response.ok) {
+        throw new Error('Fehler beim Abrufen der Daten');
+      }
+      const data: ApiInhabitant = await response.json();
+      return this.transformToInhabitant(data);
+    } catch (error) {
+      console.error('Fehler beim Abrufen der Inhabitants:', error);
+      throw error;
+    }
+    
+  }
+
   private async transformToInhabitant(apiData: ApiInhabitant): Promise<Animal | Plant> {
     const baseInhabitant = {
+      id: apiData.id,
       name: apiData.name,
       latinName: apiData.latinname,
       habitat: this.createHabitat(apiData.habitat),
@@ -149,14 +165,5 @@ export class InhabitantRepository {
       predator !== null && 
       (predator.type === InhabitantType.FISH || predator.type === InhabitantType.INVERTEBRATE)
     );
-  }
-
-  private async getInhabitantById(id: number): Promise<Animal | Plant> {
-    const response = await fetch(`${this.baseUrl}/${id}`, this.getFetchOptions());
-    if (!response.ok) {
-      throw new Error('Fehler beim Abrufen der Daten');
-    }
-    const data: ApiInhabitant = await response.json();
-    return this.transformToInhabitant(data);
   }
 } 
