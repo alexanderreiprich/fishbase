@@ -22,6 +22,35 @@ interface SearchFormProps {
   lastSearchParams?: SearchOptions
 }
 
+const temperatureMarks = [
+  {
+    value: 20,
+    label: "20°C",
+  },
+  {
+    value: 25,
+    label: "25°C",
+  },
+  {
+    value: 30,
+    label: "30°C",
+  },
+]
+const phMarks = [
+  {
+    value: 5,
+    label: "5",
+  },
+  {
+    value: 7,
+    label: "7",
+  },
+  {
+    value: 9,
+    label: "9",
+  },
+]
+
 export const SearchForm: React.FC<SearchFormProps> = ({
   onSearch,
   lastSearchParams,
@@ -192,10 +221,14 @@ export const SearchForm: React.FC<SearchFormProps> = ({
                   PH-Wert:
                 </Typography>
                 <Slider
+                  min={5}
+                  max={9}
                   getAriaLabel={() => "Temperature range"}
                   value={phValue}
                   onChange={(_e, newValue: number[]) => setPhValue(newValue)}
                   valueLabelDisplay="auto"
+                  step={0.5}
+                  marks={phMarks}
                 />
               </Grid>
               <Grid size={{ xs: 12 }}>
@@ -206,12 +239,15 @@ export const SearchForm: React.FC<SearchFormProps> = ({
                   Temperatur:
                 </Typography>
                 <Slider
+                  min={20}
+                  max={30}
                   getAriaLabel={() => "Temperature range"}
                   value={temperature}
                   onChange={(_e, newValue: number[]) =>
                     setTemperature(newValue)
                   }
                   valueLabelDisplay="auto"
+                  marks={temperatureMarks}
                 />
               </Grid>
             </>
