@@ -35,7 +35,7 @@ export const UserSearchForm: React.FC<UserSearchFormProps> = ({
       type: null,
       habitat: null,
       color: null,
-      salinity: [],
+      salinity: null,
       phValue: [],
       temperature: [],
     })

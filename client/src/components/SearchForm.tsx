@@ -22,6 +22,12 @@ interface SearchFormProps {
   lastSearchParams?: SearchOptions
 }
 
+const salinityMarks = [
+  {
+    value: 0,
+    label: "0",
+  },
+]
 const temperatureMarks = [
   {
     value: 20,
@@ -60,7 +66,7 @@ export const SearchForm: React.FC<SearchFormProps> = ({
   const [type, setType] = useState<InhabitantType | "">("")
   const [habitat, setHabitat] = useState("")
   const [color, setColor] = useState("")
-  const [salinity, setSalinity] = useState<number[]>([0, 5])
+  const [salinity, setSalinity] = useState<number>(0)
   const [phValue, setPhValue] = useState<number[]>([0, 5])
   const [temperature, setTemperature] = useState<number[]>([0, 5])
 
@@ -81,7 +87,7 @@ export const SearchForm: React.FC<SearchFormProps> = ({
       )
       setHabitat(lastSearchParams.habitat || "")
       setColor(lastSearchParams.color || "")
-      setSalinity(lastSearchParams.salinity || [0, 5])
+      setSalinity(lastSearchParams.salinity || 0)
       setPhValue(lastSearchParams.phValue || [0, 5])
       setTemperature(lastSearchParams.temperature || [0, 5])
 
@@ -106,7 +112,7 @@ export const SearchForm: React.FC<SearchFormProps> = ({
       type: type === "" ? null : typeStrings[type as number],
       habitat: habitat === "" ? null : habitat,
       color: color === "" ? null : color,
-      salinity: !salinity.length ? [0, 1] : salinity,
+      salinity: !salinity ? 0 : salinity,
       phValue: !phValue.length ? [0, 1] : phValue,
       temperature: !temperature.length ? [0, 1] : temperature,
     })
@@ -205,12 +211,14 @@ export const SearchForm: React.FC<SearchFormProps> = ({
                   Salinität:
                 </Typography>
                 <Slider
-                  getAriaLabel={() => "Temperature range"}
+                  disabled //DB only contains fish with 0 salinity by now
+                  getAriaLabel={() => "Salinity"}
                   value={salinity}
-                  onChange={(_e, newValue: number[]) => {
+                  onChange={(_e, newValue: number) => {
                     return setSalinity(newValue)
                   }}
                   valueLabelDisplay="auto"
+                  marks={salinityMarks}
                 />
               </Grid>
               <Grid size={{ xs: 12 }}>
@@ -223,7 +231,7 @@ export const SearchForm: React.FC<SearchFormProps> = ({
                 <Slider
                   min={5}
                   max={9}
-                  getAriaLabel={() => "Temperature range"}
+                  getAriaLabel={() => "Ph range"}
                   value={phValue}
                   onChange={(_e, newValue: number[]) => setPhValue(newValue)}
                   valueLabelDisplay="auto"
