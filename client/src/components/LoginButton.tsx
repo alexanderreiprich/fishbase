@@ -1,28 +1,26 @@
-import { Button } from "@mui/material";
-import { styled } from "@mui/material/styles";
-import { useState } from "react";
-import { Dialog, DialogContent } from "@mui/material";
-import LoginForm from "./LoginForm";
-import { useAuth } from "../context/AuthContext";
-import { useNavigate } from "react-router-dom";
-import StyledButton from "./StyledButton";
+import { useState } from "react"
+import { Dialog, DialogContent } from "@mui/material"
+import LoginForm from "./LoginForm"
+import { useAuth } from "../context/AuthContext"
+import { useNavigate } from "react-router-dom"
+import StyledButton from "./StyledButton"
 
 export default function LoginButton() {
-  const [open, setOpen] = useState(false);
-  const { isAuthenticated, logout } = useAuth();
-  const navigate = useNavigate();
+  const [open, setOpen] = useState(false)
+  const { isAuthenticated } = useAuth()
+  const navigate = useNavigate()
 
   const handleClick = () => {
     if (isAuthenticated) {
-      navigate("/profile");
+      navigate("/profile")
     } else {
-      setOpen(true);
+      setOpen(true)
     }
-  };
+  }
 
   const handleClose = () => {
-    setOpen(false);
-  };
+    setOpen(false)
+  }
 
   return (
     <>
@@ -39,7 +37,7 @@ export default function LoginButton() {
           sx: {
             backgroundColor: "transparent",
             boxShadow: "none",
-            },
+          },
         }}
       >
         <DialogContent>
@@ -47,5 +45,5 @@ export default function LoginButton() {
         </DialogContent>
       </Dialog>
     </>
-  );
+  )
 }

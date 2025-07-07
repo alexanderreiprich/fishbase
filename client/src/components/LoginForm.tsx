@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState } from "react"
 import {
   TextField,
   Button,
@@ -6,34 +6,30 @@ import {
   Typography,
   Alert,
   CircularProgress,
-} from "@mui/material";
-import { useAuth } from "../context/AuthContext";
-import "../style/LoginForm.css";
-import { useNavigate } from 'react-router-dom';
+} from "@mui/material"
+import { useAuth } from "../context/AuthContext"
+import "../style/LoginForm.css"
+import { useNavigate } from "react-router-dom"
 
 export default function LoginForm() {
-  const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
-  const [formError, setFormError] = useState<string | null>(null);
-  const { login, loading, error } = useAuth();
-  const navigate = useNavigate();
+  const [email, setEmail] = useState("")
+  const [password, setPassword] = useState("")
+  const [formError, setFormError] = useState<string | null>(null)
+  const { login, loading } = useAuth()
+  const navigate = useNavigate()
 
   const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
+    e.preventDefault()
     try {
-      await login(email, password);
-      navigate('/profile');
+      await login(email, password)
+      navigate("/profile")
     } catch (error) {
-      setFormError('Login failed. Please check your credentials.');
+      setFormError("Login failed. Please check your credentials.")
     }
-  };
+  }
 
   return (
-    <Box
-      component="form"
-      onSubmit={handleSubmit}
-      className="login-form"
-    >
+    <Box component="form" onSubmit={handleSubmit} className="login-form">
       <Typography variant="h5" component="h2" gutterBottom>
         Login
       </Typography>
@@ -67,5 +63,5 @@ export default function LoginForm() {
         {loading ? <CircularProgress size={24} /> : "Login"}
       </Button>
     </Box>
-  );
-};
+  )
+}
