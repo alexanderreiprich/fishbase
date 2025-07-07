@@ -11,6 +11,7 @@ import {
   Grid,
   IconButton,
   InputAdornment,
+  Slider,
 } from "@mui/material"
 import { InhabitantType } from "../interfaces/InhabitantType"
 import "../style/SearchForm.css"
@@ -30,9 +31,9 @@ export const SearchForm: React.FC<SearchFormProps> = ({
   const [type, setType] = useState<InhabitantType | "">("")
   const [habitat, setHabitat] = useState("")
   const [color, setColor] = useState("")
-  const [salinity, setSalinity] = useState("")
-  const [phValue, setPhValue] = useState("")
-  const [temperature, setTemperature] = useState("")
+  const [salinity, setSalinity] = useState<number[]>([0, 5])
+  const [phValue, setPhValue] = useState<number[]>([0, 5])
+  const [temperature, setTemperature] = useState<number[]>([0, 5])
 
   const typeStrings = ["fish", "invertebrate", "plant"]
 
@@ -51,9 +52,9 @@ export const SearchForm: React.FC<SearchFormProps> = ({
       )
       setHabitat(lastSearchParams.habitat || "")
       setColor(lastSearchParams.color || "")
-      setSalinity(lastSearchParams.salinity?.toString() || "")
-      setPhValue(lastSearchParams.phValue?.toString() || "")
-      setTemperature(lastSearchParams.temperature?.toString() || "")
+      setSalinity(lastSearchParams.salinity || [0, 5])
+      setPhValue(lastSearchParams.phValue || [0, 5])
+      setTemperature(lastSearchParams.temperature || [0, 5])
 
       // Erweiterte Suche anzeigen, wenn erweiterte Parameter verwendet wurden
       if (
@@ -76,9 +77,9 @@ export const SearchForm: React.FC<SearchFormProps> = ({
       type: type === "" ? null : typeStrings[type as number],
       habitat: habitat === "" ? null : habitat,
       color: color === "" ? null : color,
-      salinity: salinity === "" ? null : Number(salinity),
-      phValue: phValue === "" ? null : Number(phValue),
-      temperature: temperature === "" ? null : Number(temperature),
+      salinity: !salinity.length ? [0, 1] : salinity,
+      phValue: !phValue.length ? [0, 1] : phValue,
+      temperature: !temperature.length ? [0, 1] : temperature,
     })
   }
 
@@ -168,42 +169,49 @@ export const SearchForm: React.FC<SearchFormProps> = ({
                 </Typography>
               </Grid>
               <Grid size={{ xs: 12 }}>
-                <TextField
-                  fullWidth
-                  size="small"
+                <Typography
+                  className="searchform-label"
+                  style={{ marginBottom: "8px", fontWeight: "regular" }}
+                >
+                  Salinität:
+                </Typography>
+                <Slider
+                  getAriaLabel={() => "Temperature range"}
                   value={salinity}
-                  onChange={(e) => setSalinity(e.target.value)}
-                  placeholder="z.B. 1.023"
-                  label="Salinität"
-                  className="searchform-text-input"
-                  type="number"
-                  inputProps={{ min: 0, max: 40, step: 0.001 }}
+                  onChange={(_e, newValue: number[]) => {
+                    return setSalinity(newValue)
+                  }}
+                  valueLabelDisplay="auto"
                 />
               </Grid>
               <Grid size={{ xs: 12 }}>
-                <TextField
-                  fullWidth
-                  size="small"
+                <Typography
+                  className="searchform-label"
+                  style={{ marginBottom: "8px", fontWeight: "regular" }}
+                >
+                  PH-Wert:
+                </Typography>
+                <Slider
+                  getAriaLabel={() => "Temperature range"}
                   value={phValue}
-                  onChange={(e) => setPhValue(e.target.value)}
-                  placeholder="z.B. 7.2"
-                  label="pH-Wert"
-                  className="searchform-text-input"
-                  type="number"
-                  inputProps={{ min: 4, max: 10, step: 0.01 }}
+                  onChange={(_e, newValue: number[]) => setPhValue(newValue)}
+                  valueLabelDisplay="auto"
                 />
               </Grid>
               <Grid size={{ xs: 12 }}>
-                <TextField
-                  fullWidth
-                  size="small"
+                <Typography
+                  className="searchform-label"
+                  style={{ marginBottom: "8px", fontWeight: "regular" }}
+                >
+                  Temperatur:
+                </Typography>
+                <Slider
+                  getAriaLabel={() => "Temperature range"}
                   value={temperature}
-                  onChange={(e) => setTemperature(e.target.value)}
-                  placeholder="z.B. 24"
-                  label="Temperatur"
-                  className="searchform-text-input"
-                  type="number"
-                  inputProps={{ min: 0, max: 40, step: 0.1 }}
+                  onChange={(_e, newValue: number[]) =>
+                    setTemperature(newValue)
+                  }
+                  valueLabelDisplay="auto"
                 />
               </Grid>
             </>
