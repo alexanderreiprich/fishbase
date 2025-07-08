@@ -343,11 +343,6 @@ INSERT INTO water_quality (wid, iid, salinity, minTemperature, maxTemperature, m
 (31,(SELECT id FROM inhabitants WHERE name='Zwergkugelfisch'),0,24,28,7.0,7.5),
 (32,(SELECT id FROM inhabitants WHERE name='Zwergbuntbarsch'),0,24,28,6.0,7.5);
 
-
--- (33,(SELECT id FROM inhabitants WHERE name='Roter Zwergbuntbarsch'),0,24,28,6.0,7.5);
--- (34,(SELECT id FROM inhabitants WHERE name='Blauer Zwergbuntbarsch'),0,24,28,6.0,7.5);
--- (35,(SELECT id FROM inhabitants WHERE name='Gelber Zwergbuntbarsch'),0,24,28,6.0,7.5)
-
 -- wasserqualitäten pro wirbellose
 INSERT INTO water_quality (wid, iid, salinity, minTemperature, maxTemperature, minPh, maxPh) VALUES
 (33,(SELECT id FROM inhabitants WHERE name='Rote Posthornschnecke'),0,18,28,6.5,8.0),
@@ -418,7 +413,7 @@ INSERT INTO water_quality (wid, iid, salinity, minTemperature, maxTemperature, m
 (97,(SELECT id FROM inhabitants WHERE name='Cabomba caroliniana'),0,22,28,6.0,7.5);
 
 
-
+-- TODO: INSERT INTO inhabitants WHERE id = water_quality.iid (wid AS water_quality) VALUES
 
 
 
