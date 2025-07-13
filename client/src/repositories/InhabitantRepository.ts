@@ -109,6 +109,56 @@ export class InhabitantRepository {
     }
   }
 
+  public async getPredatorsForInhabitant(id: number): Promise<Animal[]> {
+    try {
+      const response = await fetch(
+        `${this.baseUrl}/predators/${id}`,
+        this.getFetchOptions()
+      )
+      if (!response.ok) {
+        throw new Error("Fehler beim Abrufen der Daten")
+      }
+      const data: ApiInhabitant[] = await response.json()
+
+      const transformedInhabitants = await Promise.all(
+        data.map(async (apiData) => {
+          let inhabitant: Animal = await this.transformToInhabitant(apiData) as Animal;
+          return inhabitant;
+        } )
+      )
+
+      return transformedInhabitants;
+    } catch (error) {
+      console.error("Fehler beim Abrufen der Predators:", error)
+      throw error
+    }
+  }
+
+  public async getVictimsForInhabitant(id: number): Promise<Animal[]> {
+    try {
+      const response = await fetch(
+        `${this.baseUrl}/victims/${id}`,
+        this.getFetchOptions()
+      )
+      if (!response.ok) {
+        throw new Error("Fehler beim Abrufen der Daten")
+      }
+      const data: ApiInhabitant[] = await response.json()
+
+      const transformedInhabitants = await Promise.all(
+        data.map(async (apiData) => {
+          let inhabitant: Animal = await this.transformToInhabitant(apiData) as Animal;
+          return inhabitant;
+        } )
+      )
+
+      return transformedInhabitants;
+    } catch (error) {
+      console.error("Fehler beim Abrufen der Victims:", error)
+      throw error
+    }
+  }
+
   private async transformToInhabitant(
     apiData: ApiInhabitant
   ): Promise<Animal | Plant> {

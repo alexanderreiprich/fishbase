@@ -74,7 +74,7 @@ const SearchPage: React.FC = () => {
           <Grid container spacing={3}>
             {animals.map((animal, index) => (
               <Grid size={{ xs: 12, sm: 6, md: 4 }} key={index}>
-                <AnimalCard animal={animal} />
+                <AnimalCard animal={animal} isPredatorConflict={false}/>
               </Grid>
             ))}
           </Grid>

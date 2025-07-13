@@ -16,6 +16,7 @@ const AddInhabitantsPage: React.FC = () => {
 	const { user } = useAuth();
   const [animals, setAnimals] = useState<Animal[]>([])
   const [plants, setPlants] = useState<Plant[]>([])
+	const [predatorConflicts, setPredatorConflicts] = useState<Animal[]>([]);
   const [loading, setLoading] = useState(false)
   const [hasSearched, setHasSearched] = useState(false)
   const [lastSearchParams, setLastSearchParams] = useState<SearchOptions | undefined>(undefined)
@@ -99,7 +100,26 @@ const AddInhabitantsPage: React.FC = () => {
     setAnimals(animals)
     setPlants(plants)
     setLoading(false)
-  }
+		if (chosenAquarium && chosenAquarium.inhabitants.length > 0) {
+			const aquariumInhabitantIds = chosenAquarium.inhabitants.map(i => i.id);
+			const predatorConflicts: Animal[] = [];
+		
+			for (const animal of animals) {
+				const predators = await repository.getPredatorsForInhabitant(animal.id);
+				const isHunted = predators.some(pred => aquariumInhabitantIds.includes(pred.id));
+		
+				const victims = await repository.getVictimsForInhabitant(animal.id);
+				const isHunter = victims.some(victim => aquariumInhabitantIds.includes(victim.id));
+		
+				if (isHunted || isHunter) {
+					predatorConflicts.push(animal);
+				}
+			}
+			setPredatorConflicts(predatorConflicts);
+		} else {
+			setPredatorConflicts([]);
+		}
+  }	
 
   if (loading) {
     return <div>Lädt...</div>
@@ -178,7 +198,7 @@ const AddInhabitantsPage: React.FC = () => {
           <Grid container spacing={3}>
             {animals.map((animal, index) => (
               <Grid size={{ xs: 12, sm: 6, md: 4 }} key={index}>
-                <AnimalCard animal={animal} onAddToAquarium={handleAddToAquarium} />
+                <AnimalCard animal={animal} onAddToAquarium={handleAddToAquarium} isPredatorConflict={predatorConflicts.includes(animal)} />
               </Grid>
             ))}
           </Grid>
