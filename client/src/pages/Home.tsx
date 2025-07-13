@@ -1,25 +1,27 @@
 import React from 'react';
 import '../style/Home.css';
-import LoginButton from '../components/LoginButton';
-import RegisterButton from '../components/RegisterButton';
-import { useAuth } from '../context/AuthContext';
+import { useNavigate } from 'react-router-dom';
+import StyledButton from '../components/StyledButton';
 
 const Home: React.FC = () => {
-  const { isAuthenticated } = useAuth();
+
+  const navigate = useNavigate();
 
   return (
     <div className="home">
       <h1>fishbase</h1>
       <h3>blubb blubb</h3>
       <div className="home-buttons">
-        {isAuthenticated ? (    
-          <LoginButton />
-        ) : (
-          <>
-            <LoginButton />
-            <RegisterButton />
-          </>
-        )}
+        <StyledButton 
+          variant="contained" 
+          onClick={() => navigate("/create")} 
+          color="primary"
+        >Aquarium erstellen</StyledButton>
+        <StyledButton 
+          variant="contained" 
+          onClick={() => navigate("/profile")} 
+          color="primary"
+        >Dein Profil</StyledButton>
       </div>
     </div>
   );

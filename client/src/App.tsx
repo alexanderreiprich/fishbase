@@ -13,6 +13,8 @@ import SearchPage from "./pages/SearchPage";
 import ListPage from "./pages/ListPage";
 import CommunityPage from "./pages/CommunityPage";
 import ProfilePage from "./pages/ProfilePage";
+import CreateAquariumForm from "./components/CreateAquariumForm";
+import AddInhabitantsPage from "./pages/AddInhabitantsPage";
 
 const ProtectedRoute: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const { user } = useAuth();
@@ -75,6 +77,22 @@ function App() {
               element={
                 <ProtectedRoute>
                   <CommunityPage />
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path="/create"
+              element={
+                <ProtectedRoute>
+                  <CreateAquariumForm />
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path="/add"
+              element={
+                <ProtectedRoute>
+                  <AddInhabitantsPage />
                 </ProtectedRoute>
               }
             />

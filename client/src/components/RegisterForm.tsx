@@ -26,12 +26,12 @@ export default function RegisterForm() {
 
     // Password validation
     if (password !== confirmPassword) {
-      setFormError("Passwords do not match");
+      setFormError("Passwörter stimmen nicht überein");
       return;
     }
 
     if (password.length < 6) {
-      setFormError("Password must be at least 6 characters long");
+      setFormError("Passwort muss mindest 6 Zeichen lang sein");
       return;
     }
 
@@ -41,7 +41,7 @@ export default function RegisterForm() {
     } catch (err) {
       // Error is already handled in AuthContext
       console.error("Registration failed:", err);
-      setFormError("Registration failed. Please try again.");
+      setFormError("Registrierung ist fehlgeschlagen, bitte versuche es nochmal.");
     }
   };
 
@@ -52,7 +52,7 @@ export default function RegisterForm() {
       className="register-form"
     >
       <Typography variant="h5" component="h2" gutterBottom>
-        Register
+        Registrierung
       </Typography>
 
       {(error || formError) && (
@@ -68,7 +68,7 @@ export default function RegisterForm() {
       />
 
       <TextField
-        label="Email"
+        label="E-Mail"
         type="email"
         value={email}
         onChange={(e) => setEmail(e.target.value)}
@@ -77,7 +77,7 @@ export default function RegisterForm() {
       />
 
       <TextField
-        label="Password"
+        label="Passwort"
         type="password"
         value={password}
         onChange={(e) => setPassword(e.target.value)}
@@ -86,7 +86,7 @@ export default function RegisterForm() {
       />
 
       <TextField
-        label="Confirm Password"
+        label="Passwort bestätigen"
         type="password"
         value={confirmPassword}
         onChange={(e) => setConfirmPassword(e.target.value)}
@@ -97,11 +97,14 @@ export default function RegisterForm() {
       <Button
         type="submit"
         variant="contained"
-        color="secondary"
+        color="primary"
         disabled={loading}
       >
-        {loading ? <CircularProgress size={24} /> : "Register"}
+        {loading ? <CircularProgress size={24} /> : "Registrieren"}
       </Button>
+      <a href="/login">
+        Zum Login wechseln
+      </a>
     </Box>
   );
 };

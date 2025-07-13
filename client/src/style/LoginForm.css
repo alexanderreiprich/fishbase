@@ -34,3 +34,8 @@
 .login-form .MuiButton-root {
   margin-top: 16px;
 }
+
+a {
+  color: white;
+  align-self: center;
+}

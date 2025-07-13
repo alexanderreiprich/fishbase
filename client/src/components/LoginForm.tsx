@@ -37,20 +37,18 @@ export default function LoginForm() {
       {formError && <Alert severity="error">{formError}</Alert>}
 
       <TextField
-        label="Email"
+        label="E-Mail"
         type="email"
         value={email}
         onChange={(e) => setEmail(e.target.value)}
-        required
         fullWidth
       />
 
       <TextField
-        label="Password"
+        label="Passwort"
         type="password"
         value={password}
         onChange={(e) => setPassword(e.target.value)}
-        required
         fullWidth
       />
 
@@ -62,6 +60,9 @@ export default function LoginForm() {
       >
         {loading ? <CircularProgress size={24} /> : "Login"}
       </Button>
+      <a href="/register">
+        Zur Registrierung wechseln
+      </a>
     </Box>
   )
 }

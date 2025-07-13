@@ -20,9 +20,11 @@ app.use(express.urlencoded({ limit: '10mb', extended: true }))
 // Routes
 const usersRoutes = require("./routes/users")
 const inhabitantsRoutes = require("./routes/inhabitants")
+const aquariumRoutes = require("./routes/aquarium")
 
 app.use("/api/users", usersRoutes)
 app.use("/api/inhabitants", inhabitantsRoutes)
+app.use("/api/aquariums", aquariumRoutes)
 
 // Server starten
 app.listen(PORT, () => {

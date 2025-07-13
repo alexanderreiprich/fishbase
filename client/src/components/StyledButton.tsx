@@ -13,7 +13,6 @@ interface StyledButtonProps {
 
 const StyledButton = styled(Button)<{ buttonColor: ButtonColor }>(({ theme, buttonColor }) => ({
   backgroundColor: theme.palette[buttonColor].main,
-  color: theme.palette.text.primary,
   '&:hover': {
     backgroundColor: theme.palette[buttonColor].dark,
   },
