@@ -70,29 +70,67 @@ router.post("/search", async (req, res) => {
       req.body;
     let result = [];
 
-    // 1. Sind alle Bedingungen wahr?
+    // 1. Synonyme hinzufügen
+    // 1.1 Termtabelle nach Suchtext durchsuchen, Term-IDs hinzufügen
+    const [termRows] = await pool.query(
+      "SELECT tid FROM terms WHERE term = ?",
+      [searchText]
+    );
+    console.log(termRows);
+    // 1.2 Synonymtabelle nach Term-IDs durchsuchen, gefundene IDs hinzufügen
+    let termIds = []
+    if (termRows.length > 0) {
+      termIds.push(termRows[0].tid);
+      console.log(termIds[0]);
+      const [synonymRows] = await pool.query(
+        "SELECT symid FROM synonyms WHERE termid = ? UNION SELECT termid FROM synonyms WHERE symid = ?",
+        [termIds[0].tid, termRows[0].tid]
+      );
+      synonymRows.forEach(row => termIds.push(row.symId || row.termid));
+    }
+    console.log(termIds);
+    // 1.3 Termtabelle nach Namen durchsuchen, basierend auf den gesammlten IDs
+    let names = [searchText];
+    if (termIds.length > 0) {
+      const [nameRows] = await pool.query(
+        `SELECT term FROM terms WHERE tid IN (${termIds.map(() => '?').join(',')})`,
+        termIds
+      );
+      names = nameRows.map(row => row.term);
+    }
+    console.log(names);
+    // 2. Sind alle Bedingungen wahr?
     const [inhabitants] = await pool.query(
-      "SELECT * FROM inhabitants WHERE name = ? AND type = ? AND habitat = ? AND color = ?", // TODO: Include Water Quality and Predators
-      [searchText, type, habitat, color]
+      `SELECT * FROM inhabitants WHERE name IN (${names.map(() => '?').join(',')}) AND type = ? AND habitat = ? AND color = ?`, // TODO: Include Water Quality and Predators
+      [...names, type, habitat, color]
     );
     result = inhabitants;
-    if (inhabitants.length == 0) {
-      // 2. Ist wenigstens eine Bedingung wahr?
-      const [inhabitants] = await pool.query(
-        "SELECT * FROM inhabitants WHERE name = ? OR type = ? OR habitat = ? OR color = ?",
-        [searchText, type, habitat, color]
+    if (result.length == 0) {
+      // 3. Fuzzy Search und Stemsearch, Narrow Term
+      const [narrowterms] = await pool.query(
+        "SELECT tid FROM terms WHERE term = ? AND tid <= 7",
+        [searchText]
       );
-      result = inhabitants;
-      if (inhabitants.length == 0) {
-        // 3. Ist der Suchtext irgendwo enthalten?
+      if (narrowterms.length > 0) {
+        const [inhabitants] = await pool.query(
+          "SELECT i.* FROM inhabitants i JOIN terms t on i.name = t.term WHERE t.oid = ?",
+          [narrowterms[0].id]
+        );
+        result = inhabitants;
+      }
+      // TODO: Stemsearch
+      // TODO: Fuzzy Search
+      if (result.length == 0) {
+        // 4. Ist wenigstens eine Bedingung wahr?
+        // TODO: Soll LIKE benutzt werden?
         let expandedSearchText = `%${req.body.searchText}%`;
         const [inhabitants] = await pool.query(
-          "SELECT * FROM inhabitants WHERE name LIKE ? OR type = ? OR habitat = ? OR color = ?",
+          "SELECT * FROM inhabitants WHERE name = ? OR type = ? OR habitat = ? OR color = ?",
           [expandedSearchText, type, habitat, color]
         );
         result = inhabitants;
-        if (inhabitants.length == 0) {
-          // 4. Fuzzy-Search und Stem-Search aktivieren
+        if (result.length == 0) {
+          // 5. Suche ergibt keine Ergebnisse
           return res
             .status(404)
             .json({ message: "Spezies wurde nicht gefunden" });
