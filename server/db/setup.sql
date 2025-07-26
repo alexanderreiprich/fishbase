@@ -25,9 +25,11 @@ DROP TABLE IF EXISTS aquariums;
 CREATE TABLE aquariums (
   id SMALLINT PRIMARY KEY AUTO_INCREMENT,
   userid SMALLINT NOT NULL,
+  waterqualityid SMALLINT NOT NULL,
   name VARCHAR(50) NOT NULL,
   capacity INT NOT NULL,
-  FOREIGN KEY (userid) REFERENCES users(id)
+  FOREIGN KEY (userid) REFERENCES users(id),
+  FOREIGN KEY (waterqualityid) REFERENCES water_quality(wid)
 );
 
 DROP TABLE IF EXISTS inhabitants;

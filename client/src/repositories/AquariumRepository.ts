@@ -40,6 +40,9 @@ export class AquariumRepository {
         this.getFetchOptions()
       );
       if (!response.ok) {
+				if (response.status === 404) {
+					return [];
+				}
         throw new Error("Fehler beim Abrufen der Daten");
       }
       const data: ApiAquarium[] = await response.json();

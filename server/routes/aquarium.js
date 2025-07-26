@@ -10,8 +10,8 @@ router.post('/user/:id', async (req, res) => {
 		console.log(`Route POST aquariums/user/:id wurde aufgerufen mit ID: ${id}`);
 
     const [result] = await pool.query(
-      'INSERT INTO aquariums (userid, capacity, name) VALUES (?, ?, ?)',
-      [id, capacity, name]
+      'INSERT INTO aquariums (userid, waterqualityid, capacity, name) VALUES (?, ?, ?, ?)',
+      [id, -1, capacity, name]
     );
 
     res.status(201).json({
@@ -66,7 +66,7 @@ router.get('/user/:id', async (req, res) => {
 router.post('/add', async (req, res) => {
   try {
     const { aquariumId, inhabitantId, amount } = req.body;
-		console.log(`Route aquariums/add wurde aufgerufen`);
+		console.log(`Route POST aquariums/add wurde aufgerufen`);
 
     // Prüfen ob das Aquarium existiert
     const [aquarium] = await pool.query(
@@ -86,6 +86,27 @@ router.post('/add', async (req, res) => {
 
     if (inhabitant.length === 0) {
       return res.status(404).json({ message: 'Inhabitant nicht gefunden' });
+    }
+
+    // Prüfen ob es der erste Inhabitant ist
+    const [amountOfInhabitants] = await pool.query(
+      'SELECT * FROM inhabitants_aquariums WHERE aid = ?',
+      [aquariumId]
+    );
+
+    if (amountOfInhabitants.length === 0) {
+      // Hole die waterqualityid (wid) des Inhabitants
+      const [inhabitantRows] = await pool.query(
+        'SELECT wid FROM water_quality WHERE iid = ?',
+        [inhabitantId]
+      );
+      if (inhabitantRows.length > 0) {
+        const wid = inhabitantRows[0].wid;
+        await pool.query(
+          'UPDATE aquariums SET waterqualityid = ? WHERE id = ?',
+          [wid, aquariumId]
+        );
+      }
     }
 
     // Prüfen ob die Beziehung bereits existiert
@@ -115,6 +136,25 @@ router.post('/add', async (req, res) => {
   } catch (error) {
     console.error('Fehler:', error);
     res.status(500).json({ message: 'Serverfehler beim Hinzufügen des Inhabitants' });
+  }
+});
+
+router.get("/waterquality/:id", async(req, res) => {
+  try {
+    const { id } = req.params;
+    console.log(`Route GET aquariums/waterquality/:id wurde aufgerufen mit ID: ${id}`);
+    const [water_quality] = await pool.query(
+      "SELECT * FROM water_quality WHERE wid = ?",
+      [id]
+    );
+    if (water_quality.length === 0) {
+      return res.status(404).json({ message: "Keine Wasserqualität gefunden" });
+    }
+
+    res.status(200).json(water_quality);
+  } catch (error) {
+    console.error('Fehler:', error);
+    res.status(500).json({ message: 'Serverfehler bei der Abfrage der Wasserqualität' });
   }
 });
 
