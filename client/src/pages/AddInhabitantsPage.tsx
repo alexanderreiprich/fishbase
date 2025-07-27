@@ -2,7 +2,7 @@ import { Grid, Typography, Box, FormControl, InputLabel, Select, MenuItem } from
 import AnimalCard from "../components/AnimalCard"
 import { Animal } from "../interfaces/Animal"
 import { Plant } from "../interfaces/Plant"
-import { useState, useEffect } from "react"
+import { useState, useEffect, useMemo } from "react"
 import PlantCard from "../components/PlantCard"
 import { SearchForm } from "../components/SearchForm"
 import { InhabitantRepository } from "../repositories/InhabitantRepository"
@@ -20,9 +20,16 @@ const AddInhabitantsPage: React.FC = () => {
   const [loading, setLoading] = useState(false)
   const [hasSearched, setHasSearched] = useState(false)
   const [lastSearchParams, setLastSearchParams] = useState<SearchOptions | undefined>(undefined)
-	const [chosenAquarium, setChosenAquarium] = useState<Aquarium | null>(null);
+	const [chosenAquariumId, setChosenAquariumId] = useState<number | null>(null);
 	const [allAquariums, setAllAquariums] = useState<Aquarium[] | null>(null);
-	const repository = AquariumRepository.getInstance();
+	const aquariumRepository = AquariumRepository.getInstance();
+	const inhabitantRepository = InhabitantRepository.getInstance();
+
+	// Das aktuelle Aquarium wird automatisch aktualisiert, wenn sich allAquariums ändert
+	const chosenAquarium = useMemo(() => {
+		if (!chosenAquariumId || !allAquariums) return null;
+		return allAquariums.find(aquarium => aquarium.id === chosenAquariumId) || null;
+	}, [chosenAquariumId, allAquariums]);
 
 	// Beim Laden der Komponente alle Aquarien des Nutzers abrufen
 	useEffect(() => {
@@ -35,19 +42,19 @@ const AddInhabitantsPage: React.FC = () => {
 	const fetchAquariums = async () => {
 		setLoading(true);
 		try {
-			const aquariums = await repository.getAquariumsOfUser(user!.id);
+			const aquariums = await aquariumRepository.getAquariumsOfUser(user!.id);
 			setAllAquariums(aquariums);
 		} catch (error) {
 			console.error("Fehler beim Abrufen der Aquarien:", error);
 		} finally {
+      await checkPredatorConflicts();
 			setLoading(false);
 		}
 	}
 
 	const handleAquariumChange = (event: any) => {
 		const aquariumId = event.target.value;
-		const selectedAquarium = allAquariums?.find(aquarium => aquarium.id === aquariumId) || null;
-		setChosenAquarium(selectedAquarium);
+		setChosenAquariumId(aquariumId);
 	};
 
 	const handleAddToAquarium = async (inhabitantId: number, quantity: number) => {
@@ -58,13 +65,13 @@ const AddInhabitantsPage: React.FC = () => {
 
 		try {
 			setLoading(true);
-			await repository.addInhabitantToAquarium(chosenAquarium.id, inhabitantId, quantity);
-			
-			// Aquarium-Daten aktualisieren
-			await fetchAquariums();
+			await aquariumRepository.addInhabitantToAquarium(chosenAquarium.id, inhabitantId, quantity);
 			
 			// Erfolgsmeldung
 			alert(`${quantity} Inhabitant(s) wurden erfolgreich zum Aquarium hinzugefügt!`);
+
+      // Aquarium-Daten aktualisieren
+			await fetchAquariums();
 		} catch (error) {
 			console.error('Fehler beim Hinzufügen des Inhabitants:', error);
 			alert('Fehler beim Hinzufügen des Inhabitants');
@@ -77,8 +84,7 @@ const AddInhabitantsPage: React.FC = () => {
     setLoading(true);
     setHasSearched(true);
     setLastSearchParams(searchParams);
-    const repository = InhabitantRepository.getInstance();
-    const data = await repository.getInhabitants(searchParams);
+    const data = await inhabitantRepository.getInhabitants(searchParams);
 
     let animals: Animal[] = []
     let plants: Plant[] = []
@@ -99,16 +105,20 @@ const AddInhabitantsPage: React.FC = () => {
 
     setAnimals(animals)
     setPlants(plants)
+    await checkPredatorConflicts();
     setLoading(false)
-		if (chosenAquarium && chosenAquarium.inhabitants.length > 0) {
+  }	
+
+  const checkPredatorConflicts = async () => {
+    if (chosenAquarium && chosenAquarium.inhabitants.length > 0) {
 			const aquariumInhabitantIds = chosenAquarium.inhabitants.map(i => i.id);
 			const predatorConflicts: Animal[] = [];
 		
 			for (const animal of animals) {
-				const predators = await repository.getPredatorsForInhabitant(animal.id);
+				const predators = await inhabitantRepository.getPredatorsForInhabitant(animal.id);
 				const isHunted = predators.some(pred => aquariumInhabitantIds.includes(pred.id));
 		
-				const victims = await repository.getVictimsForInhabitant(animal.id);
+				const victims = await inhabitantRepository.getVictimsForInhabitant(animal.id);
 				const isHunter = victims.some(victim => aquariumInhabitantIds.includes(victim.id));
 		
 				if (isHunted || isHunter) {
@@ -119,7 +129,7 @@ const AddInhabitantsPage: React.FC = () => {
 		} else {
 			setPredatorConflicts([]);
 		}
-  }	
+  }
 
   if (loading) {
     return <div>Lädt...</div>
@@ -137,7 +147,7 @@ const AddInhabitantsPage: React.FC = () => {
           <Select
             labelId="aquarium-select-label"
             id="aquarium-select"
-            value={chosenAquarium?.id || ''}
+            value={chosenAquariumId || ''}
             label="Aquarium auswählen"
             onChange={handleAquariumChange}
             sx={{

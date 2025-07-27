@@ -119,9 +119,11 @@ export default function AnimalCard({
           </Typography>
         ) : null}
         </CardContent>
-        <CardActions>
-          <Button onClick={handleAddToAquarium}>Auswählen</Button>
-        </CardActions>
+        {onAddToAquarium ? (
+          <CardActions>
+            <Button onClick={handleAddToAquarium}>Auswählen</Button>
+          </CardActions>
+        ) : null}
       </Card>
 
       <QuantityModal
