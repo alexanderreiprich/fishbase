@@ -25,7 +25,7 @@ export default function CreateAquariumForm() {
   }
 
 	return (
-		<Box component="form" onSubmit={handleSubmit} className="login-form">
+		<Box component="form" onSubmit={handleSubmit} className="login-form" sx={{ borderColor: 'var(--primary-main)', p: 2, borderWidth: 2, borderStyle: 'solid' }}>
       <Typography variant="h5" component="h2" gutterBottom>
         Aquarium erstellen
       </Typography>

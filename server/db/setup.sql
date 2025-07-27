@@ -19,19 +19,6 @@ CREATE TABLE users (
   aquarium MEDIUMBLOB
 );
 
-DROP TABLE IF EXISTS aquariums;
-
--- aquarientabelle erstellen
-CREATE TABLE aquariums (
-  id SMALLINT PRIMARY KEY AUTO_INCREMENT,
-  userid SMALLINT NOT NULL,
-  waterqualityid SMALLINT NOT NULL,
-  name VARCHAR(50) NOT NULL,
-  capacity INT NOT NULL,
-  FOREIGN KEY (userid) REFERENCES users(id),
-  FOREIGN KEY (waterqualityid) REFERENCES water_quality(wid)
-);
-
 DROP TABLE IF EXISTS inhabitants;
 
 -- artentabelle erstellen
@@ -47,6 +34,34 @@ CREATE TABLE inhabitants (
   food VARCHAR(100),       -- nur für tiere
   minheight FLOAT,         -- nur für pflanzen
   maxheight FLOAT          -- nur für pflanzen
+);
+
+DROP TABLE IF EXISTS water_quality;
+
+-- wasserqualitäten, wird referenziert von habitat
+CREATE TABLE water_quality (
+  wid SMALLINT,
+  iid SMALLINT,
+  salinity DECIMAL,
+  minTemperature DECIMAL,
+  maxTemperature DECIMAL,
+  minPh FLOAT,
+  maxPh FLOAT,
+  FOREIGN KEY (iid) REFERENCES inhabitants(id),
+  PRIMARY KEY (wid)
+);
+
+DROP TABLE IF EXISTS aquariums;
+
+-- aquarientabelle erstellen
+CREATE TABLE aquariums (
+  id SMALLINT PRIMARY KEY AUTO_INCREMENT,
+  userid SMALLINT NOT NULL,
+  waterqualityid SMALLINT NOT NULL,
+  name VARCHAR(50) NOT NULL,
+  capacity INT NOT NULL,
+  FOREIGN KEY (userid) REFERENCES users(id),
+  FOREIGN KEY (waterqualityid) REFERENCES water_quality(wid)
 );
 
 DROP TABLE IF EXISTS predators;
@@ -295,20 +310,6 @@ INSERT INTO terms (term, oid) VALUES
   ('Gelber Zwergbuntbarsch', 7),
   ('Roter Zwergbuntbarsch', 7);
 
-DROP TABLE IF EXISTS water_quality;
-
--- wasserqualitäten, wird referenziert von habitat
-CREATE TABLE water_quality (
-  wid SMALLINT,
-  iid SMALLINT,
-  salinity DECIMAL,
-  minTemperature DECIMAL,
-  maxTemperature DECIMAL,
-  minPh FLOAT,
-  maxPh FLOAT,
-  FOREIGN KEY (iid) REFERENCES inhabitants(id),
-  PRIMARY KEY (iid, wid)
-);
 
 -- wasserqualitäten pro fisch
 INSERT INTO water_quality (wid, iid, salinity, minTemperature, maxTemperature, minPh, maxPh) VALUES 

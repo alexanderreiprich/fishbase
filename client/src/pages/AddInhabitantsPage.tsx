@@ -140,6 +140,11 @@ const AddInhabitantsPage: React.FC = () => {
             value={chosenAquarium?.id || ''}
             label="Aquarium auswählen"
             onChange={handleAquariumChange}
+            sx={{
+              '& .MuiSelect-icon': {
+                color: 'white',
+              },
+            }}
           >
             {allAquariums?.map((aquarium) => (
               <MenuItem key={aquarium.id} value={aquarium.id}>

@@ -14,6 +14,7 @@ import ListPage from "./pages/ListPage";
 import CommunityPage from "./pages/CommunityPage";
 import ProfilePage from "./pages/ProfilePage";
 import CreateAquariumForm from "./components/CreateAquariumForm";
+import AquariumPage from "./pages/AquariumPage";
 import AddInhabitantsPage from "./pages/AddInhabitantsPage";
 
 const ProtectedRoute: React.FC<{ children: React.ReactNode }> = ({ children }) => {
@@ -84,7 +85,7 @@ function App() {
               path="/create"
               element={
                 <ProtectedRoute>
-                  <CreateAquariumForm />
+                  <AquariumPage />
                 </ProtectedRoute>
               }
             />
