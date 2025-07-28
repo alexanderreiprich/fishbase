@@ -30,6 +30,10 @@ const salinityMarks = [
 ]
 const temperatureMarks = [
   {
+    value: 15,
+    label: "15°C"
+  },
+  {
     value: 20,
     label: "20°C",
   },
@@ -48,8 +52,16 @@ const phMarks = [
     label: "5",
   },
   {
+    value: 6,
+    label: "6",
+  },
+  {
     value: 7,
     label: "7",
+  },
+  {
+    value: 8,
+    label: "8",
   },
   {
     value: 9,
@@ -67,8 +79,8 @@ export const SearchForm: React.FC<SearchFormProps> = ({
   const [habitat, setHabitat] = useState("")
   const [color, setColor] = useState("")
   const [salinity, setSalinity] = useState<number>(0)
-  const [phValue, setPhValue] = useState<number[]>([0, 5])
-  const [temperature, setTemperature] = useState<number[]>([0, 5])
+  const [phValue, setPhValue] = useState<number[]>([5, 9])
+  const [temperature, setTemperature] = useState<number[]>([15, 30])
 
   const typeStrings = ["fish", "invertebrate", "plant"]
 
@@ -203,7 +215,9 @@ export const SearchForm: React.FC<SearchFormProps> = ({
                   Wasserqualität:
                 </Typography>
               </Grid>
-              <Grid size={{ xs: 12 }}>
+              {
+              // Disabled due to salinity always being zero
+              /* <Grid size={{ xs: 12 }}>
                 <Typography
                   className="searchform-label"
                   style={{ marginBottom: "8px", fontWeight: "regular" }}
@@ -220,7 +234,7 @@ export const SearchForm: React.FC<SearchFormProps> = ({
                   valueLabelDisplay="auto"
                   marks={salinityMarks}
                 />
-              </Grid>
+              </Grid> */}
               <Grid size={{ xs: 12 }}>
                 <Typography
                   className="searchform-label"
@@ -247,7 +261,7 @@ export const SearchForm: React.FC<SearchFormProps> = ({
                   Temperatur:
                 </Typography>
                 <Slider
-                  min={20}
+                  min={15}
                   max={30}
                   getAriaLabel={() => "Temperature range"}
                   value={temperature}

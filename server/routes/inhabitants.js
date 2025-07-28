@@ -66,8 +66,7 @@ router.get("/:id", async (req, res) => {
 router.post("/search", async (req, res) => {
   try {
     console.log("Route /search wurde aufgerufen");
-    const { searchText, type, habitat, color, salinity, phValue, temperature } =
-      req.body;
+    const { searchText, type, habitat, salinity, phValue, temperature, colors } = req.body;
     let result = [];
 
     // 1. Synonyme hinzufügen
@@ -98,13 +97,21 @@ router.post("/search", async (req, res) => {
       );
       names = nameRows.map(row => row.term);
     }
-    console.log(names);
+
+    // Dynamische Query basierend auf colors
+    let query = `SELECT * FROM inhabitants A, water_quality B WHERE A.id = B.iid AND (A.name IN (${names.map(() => '?').join(',')}) AND A.type=? AND A.habitat=? AND B.minTemperature >= ? AND B.maxTemperature <= ? AND B.minPh >= ? AND B.maxPh <= ?)`;
+    let params = [...names, type, habitat, temperature[0], temperature[1], phValue[0], phValue[1]]
+
+    if (colors && colors.length > 0) {
+      const colorConditions = colors.map(() => 'color LIKE ?').join(' OR ')
+      query += ` AND (${colorConditions})`
+      params.push(...colors.map(color => `%${color}%`))
+    }
+    
     // 2. Sind alle Bedingungen wahr?
-    const [inhabitants] = await pool.query(
-      `SELECT * FROM inhabitants WHERE name IN (${names.map(() => '?').join(',')}) AND type = ? AND habitat = ? AND color = ?`, // TODO: Include Water Quality and Predators
-      [...names, type, habitat, color]
-    );
+    const [inhabitants] = await pool.query(query, params);
     result = inhabitants;
+
     if (result.length == 0) {
       // 3. Fuzzy Search und Stemsearch, Narrow Term
       const [narrowterms] = await pool.query(
@@ -120,13 +127,18 @@ router.post("/search", async (req, res) => {
       }
       // TODO: Stemsearch
       // TODO: Fuzzy Search
+
       if (result.length == 0) {
         // 4. Ist wenigstens eine Bedingung wahr?
-        // TODO: Soll LIKE benutzt werden?
-        let expandedSearchText = `%${req.body.searchText}%`;
+        // Erstelle Wildcard-Bedingungen für alle Namen
+        const nameConditions = names.map(() => 'A.name LIKE ?').join(' OR ');
+        const nameParams = names.map(name => `%${name}%`);
+        console.log(nameConditions);
+        console.log(nameParams);
+        console.log(type, habitat, temperature[0], temperature[1], phValue[0], phValue[1]);
         const [inhabitants] = await pool.query(
-          "SELECT * FROM inhabitants WHERE name = ? OR type = ? OR habitat = ? OR color = ?",
-          [expandedSearchText, type, habitat, color]
+          `SELECT * FROM inhabitants A, water_quality B WHERE A.id = B.iid AND (${nameConditions} OR A.type = ? OR A.habitat = ? OR (B.minTemperature >= ? AND B.maxTemperature <= ?) OR (B.minPh >= ? AND B.maxPh <= ?))`,
+          [...nameParams, type, habitat, temperature[0], temperature[1], phValue[0], phValue[1]]
         );
         result = inhabitants;
         if (result.length == 0) {
