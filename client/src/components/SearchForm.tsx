@@ -12,6 +12,9 @@ import {
   IconButton,
   InputAdornment,
   Slider,
+  FormGroup,
+  FormControlLabel,
+  Checkbox,
 } from "@mui/material"
 import { InhabitantType } from "../interfaces/InhabitantType"
 import "../style/SearchForm.css"
@@ -57,6 +60,19 @@ const phMarks = [
   },
 ]
 
+const initialColors = {
+  rot: false,
+  orange: false,
+  gelb: false,
+  grün: false,
+  blau: false,
+  silber: false,
+  schwarz: false,
+  weiß: false,
+  braun: false,
+  bunt: false,
+}
+
 export const SearchForm: React.FC<SearchFormProps> = ({
   onSearch,
   lastSearchParams,
@@ -65,10 +81,12 @@ export const SearchForm: React.FC<SearchFormProps> = ({
   const [showAdvanced, setShowAdvanced] = useState(false)
   const [type, setType] = useState<InhabitantType | "">("")
   const [habitat, setHabitat] = useState("")
-  const [color, setColor] = useState("")
   const [salinity, setSalinity] = useState<number>(0)
   const [phValue, setPhValue] = useState<number[]>([0, 5])
   const [temperature, setTemperature] = useState<number[]>([0, 5])
+  const [colors, setColors] = React.useState<{ [key: string]: boolean }>(
+    initialColors
+  )
 
   const typeStrings = ["fish", "invertebrate", "plant"]
 
@@ -86,19 +104,25 @@ export const SearchForm: React.FC<SearchFormProps> = ({
           : ""
       )
       setHabitat(lastSearchParams.habitat || "")
-      setColor(lastSearchParams.color || "")
       setSalinity(lastSearchParams.salinity || 0)
       setPhValue(lastSearchParams.phValue || [0, 5])
       setTemperature(lastSearchParams.temperature || [0, 5])
-
+      setColors(
+        Object.fromEntries(
+          Object.entries(initialColors).map(([color, _checked]) => [
+            color,
+            lastSearchParams.colors.includes(color),
+          ])
+        )
+      )
       // Erweiterte Suche anzeigen, wenn erweiterte Parameter verwendet wurden
       if (
         lastSearchParams.habitat ||
-        lastSearchParams.color ||
         lastSearchParams.salinity ||
         lastSearchParams.phValue ||
         lastSearchParams.temperature ||
-        lastSearchParams.type
+        lastSearchParams.type ||
+        lastSearchParams.colors
       ) {
         setShowAdvanced(true)
       }
@@ -111,10 +135,17 @@ export const SearchForm: React.FC<SearchFormProps> = ({
       searchText: search === "" ? null : search,
       type: type === "" ? null : typeStrings[type as number],
       habitat: habitat === "" ? null : habitat,
-      color: color === "" ? null : color,
       salinity: !salinity ? 0 : salinity,
       phValue: !phValue.length ? [0, 1] : phValue,
       temperature: !temperature.length ? [0, 1] : temperature,
+      colors: !colors ? [] : Object.keys(colors).filter((key) => colors[key]), // creates an array only containing colors that are selected
+    })
+  }
+
+  const handleColorChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    setColors({
+      ...colors,
+      [event.target.name]: event.target.checked,
     })
   }
 
@@ -185,15 +216,21 @@ export const SearchForm: React.FC<SearchFormProps> = ({
                 />
               </Grid>
               <Grid size={{ xs: 12 }}>
-                <TextField
-                  fullWidth
-                  size="small"
-                  value={color}
-                  onChange={(e) => setColor(e.target.value)}
-                  placeholder="z.B. rot"
-                  label="Farbe"
-                  className="searchform-text-input"
-                />
+                <FormGroup>
+                  {colors &&
+                    Object.entries(colors).map(([color, checked]) => (
+                      <FormControlLabel
+                        control={
+                          <Checkbox
+                            checked={checked}
+                            onChange={handleColorChange}
+                            name={color.toString()}
+                          />
+                        }
+                        label={color.toString()}
+                      />
+                    ))}
+                </FormGroup>
               </Grid>
               <Grid size={{ xs: 12 }}>
                 <Typography

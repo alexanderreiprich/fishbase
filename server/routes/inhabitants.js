@@ -66,18 +66,23 @@ router.get("/:id", async (req, res) => {
 router.post("/search", async (req, res) => {
   try {
     console.log("Route /search wurde aufgerufen")
-    const { searchText, type, habitat, color, salinity, phValue, temperature } =
-      req.body
+    const {
+      searchText,
+      type,
+      habitat,
+      salinity,
+      phValue,
+      temperature,
+      colors,
+    } = req.body
     let result = []
 
-    // console.log(
-    //   `SELECT * FROM inhabitants A, water_quality B WHERE A.ID = B.IID AND (A.name = ${searchText} AND A.type = ${type} AND A.habitat = ${habitat} AND salinity = 0 AND mintemperature >= ${temperature[0]} AND maxtemperature <= ${temperature[1]} AND minph >= ${phValue[0]} AND maxph <= ${phValue[1]})`
-    // )
+    const wildcardSearch = "%" + searchText + "%"
 
     const [inhabitants] = await pool.query(
-      "SELECT * FROM Inhabitants A, water_quality B WHERE A.ID = B.IID AND (A.name = ? AND A.type=? AND A.habitat=? AND B.salinity = ? AND B.mintemperature >= ? AND B.maxtemperature <= ? AND B.minph >= ? AND B.maxph <= ?)",
+      "SELECT * FROM Inhabitants A, water_quality B WHERE A.ID = B.IID AND (A.name LIKE ? AND A.type=? AND A.habitat=? AND B.salinity = ? AND B.mintemperature >= ? AND B.maxtemperature <= ? AND B.minph >= ? AND B.maxph <= ?) AND color IN (?)",
       [
-        searchText,
+        wildcardSearch,
         type,
         habitat,
         salinity,
@@ -85,6 +90,7 @@ router.post("/search", async (req, res) => {
         temperature[1],
         phValue[0],
         phValue[1],
+        colors,
       ]
     )
 
@@ -92,16 +98,16 @@ router.post("/search", async (req, res) => {
     if (inhabitants.length == 0) {
       // 2. Ist wenigstens eine Bedingung wahr?
       const [inhabitants] = await pool.query(
-        "SELECT * FROM inhabitants WHERE name = ? OR type = ? OR habitat = ? OR color = ?",
-        [searchText, type, habitat, color]
+        "SELECT * FROM inhabitants WHERE name = ? OR type = ? OR habitat = ? OR color IN (?)",
+        [searchText, type, habitat, colors]
       )
       result = inhabitants
       if (inhabitants.length == 0) {
         // 3. Ist der Suchtext irgendwo enthalten?
         let expandedSearchText = `%${req.body.searchText}%`
         const [inhabitants] = await pool.query(
-          "SELECT * FROM inhabitants WHERE name LIKE ? OR type = ? OR habitat = ? OR color = ?",
-          [expandedSearchText, type, habitat, color]
+          "SELECT * FROM inhabitants WHERE name LIKE ? OR type = ? OR habitat = ? OR color IN (?)",
+          [expandedSearchText, type, habitat, colors]
         )
         result = inhabitants
         if (inhabitants.length == 0) {
