@@ -79,36 +79,45 @@ router.post("/search", async (req, res) => {
 
     const wildcardSearch = "%" + searchText + "%"
 
-    const [inhabitants] = await pool.query(
-      "SELECT * FROM Inhabitants A, water_quality B WHERE A.ID = B.IID AND (A.name LIKE ? AND A.type=? AND A.habitat=? AND B.salinity = ? AND B.mintemperature >= ? AND B.maxtemperature <= ? AND B.minph >= ? AND B.maxph <= ?) AND color IN (?)",
-      [
-        wildcardSearch,
-        type,
-        habitat,
-        salinity,
-        temperature[0],
-        temperature[1],
-        phValue[0],
-        phValue[1],
-        colors,
-      ]
-    )
+    // Dynamische Query basierend auf colors
+    let query = "SELECT * FROM Inhabitants A, water_quality B WHERE A.ID = B.IID AND (A.name LIKE ? AND A.type=? AND A.habitat=? AND B.salinity = ? AND B.mintemperature >= ? AND B.maxtemperature <= ? AND B.minph >= ? AND B.maxph <= ?)"
+    let params = [wildcardSearch, type, habitat, salinity, temperature[0], temperature[1], phValue[0], phValue[1]]
+
+    if (colors && colors.length > 0) {
+      const colorConditions = colors.map(() => 'color LIKE ?').join(' OR ')
+      query += ` AND (${colorConditions})`
+      params.push(...colors.map(color => `%${color}%`))
+    }
+
+    const [inhabitants] = await pool.query(query, params)
 
     result = inhabitants
     if (inhabitants.length == 0) {
       // 2. Ist wenigstens eine Bedingung wahr?
-      const [inhabitants] = await pool.query(
-        "SELECT * FROM inhabitants WHERE name = ? OR type = ? OR habitat = ? OR color IN (?)",
-        [searchText, type, habitat, colors]
-      )
+      let fallbackQuery = "SELECT * FROM inhabitants WHERE name = ? OR type = ? OR habitat = ?"
+      let fallbackParams = [searchText, type, habitat]
+      
+      if (colors && colors.length > 0) {
+        const colorConditions = colors.map(() => 'color LIKE ?').join(' OR ')
+        fallbackQuery += ` OR (${colorConditions})`
+        fallbackParams.push(...colors.map(color => `%${color}%`))
+      }
+
+      const [inhabitants] = await pool.query(fallbackQuery, fallbackParams)
       result = inhabitants
       if (inhabitants.length == 0) {
         // 3. Ist der Suchtext irgendwo enthalten?
         let expandedSearchText = `%${req.body.searchText}%`
-        const [inhabitants] = await pool.query(
-          "SELECT * FROM inhabitants WHERE name LIKE ? OR type = ? OR habitat = ? OR color IN (?)",
-          [expandedSearchText, type, habitat, colors]
-        )
+        let fuzzyQuery = "SELECT * FROM inhabitants WHERE name LIKE ? OR type = ? OR habitat = ?"
+        let fuzzyParams = [expandedSearchText, type, habitat]
+        
+        if (colors && colors.length > 0) {
+          const colorConditions = colors.map(() => 'color LIKE ?').join(' OR ')
+          fuzzyQuery += ` OR (${colorConditions})`
+          fuzzyParams.push(...colors.map(color => `%${color}%`))
+        }
+
+        const [inhabitants] = await pool.query(fuzzyQuery, fuzzyParams)
         result = inhabitants
         if (inhabitants.length == 0) {
           // 4. Fuzzy-Search und Stem-Search aktivieren
