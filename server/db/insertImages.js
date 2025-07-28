@@ -5,10 +5,10 @@ const path = require("path");
 async function insertImages() {
   // Datenbankverbindung herstellen
   const connection = await mysql.createConnection({
-    host: "localhost",
-    user: "root",
-    password: "root",
-    database: "fishbase",
+    host: process.env.MYSQLHOST,
+    user: process.env.MYSQLUSER,
+    password: process.env.MYSQLPASSWORD,
+    database: process.env.MYSQLDATABASE,
   });
 
   try {

@@ -260,18 +260,6 @@ def main():
     """Hauptfunktion"""
     downloader = AquariumImageDownloader()
     
-    # Beispiel-Artenliste (können Sie durch Ihre eigene ersetzen)
-    species_list = [
-        "Poecilia reticulata",  # Guppy
-        "Betta splendens",      # Kampffisch
-        "Neon tetra",           # Neonsalmler
-        "Corydoras paleatus",   # Panzerwels
-        "Anubias barteri",      # Anubias (Pflanze)
-        "Vallisneria spiralis", # Vallisnerie (Pflanze)
-    ]
-    
-    # Alternative: Aus CSV-Datei laden
-    # Erstellen Sie eine CSV-Datei namens 'species_list.csv' mit einer Spalte für die Artennamen
     csv_file = "species_list.csv"
     if os.path.exists(csv_file):
         print(f"Lade Artenliste aus {csv_file}")
