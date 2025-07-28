@@ -87,6 +87,51 @@ async function searchWithWildcards(names, type, habitat, temperature, phValue, c
   // Basis-Query ohne Klammern
   if (nameConditions) {
     // Mit Namenssuche
+    query = `SELECT * FROM inhabitants A, water_quality B WHERE A.id = B.iid AND ${nameConditions}`;
+    params = [...nameParams];
+  } else {
+    // Nur andere Kriterien
+    query = `SELECT * FROM inhabitants A, water_quality B WHERE A.id = B.iid AND (A.type = ? OR A.habitat = ? OR (B.minTemperature >= ? AND B.maxTemperature <= ?) OR (B.minPh >= ? AND B.maxPh <= ?)`;
+    params = [type, habitat, temperature[0], temperature[1], phValue[0], phValue[1]];
+
+		// Farben hinzufügen
+		if (colors && colors.length > 0) {
+			const colorConditions = colors.map(() => 'A.color LIKE ?').join(' OR ')
+			query += ` OR (${colorConditions})`
+			params.push(...colors.map(color => `%${color}%`))
+		}
+		
+		// Klammer schließen
+		query += `)`
+  } 
+
+  
+  const [inhabitants] = await pool.query(query, params);
+  return inhabitants;
+}
+
+async function searchWithOrConstraint(names, type, habitat, temperature, phValue, colors) {
+  // Erstelle Wildcard-Bedingungen für alle Namen
+	let nameConditions = "";
+	let nameParams = [];
+	if (names[0] == null) {
+		// Keine Namenssuche - nur andere Kriterien
+		nameConditions = "";
+	}
+	else {
+		nameConditions = names.map(() => 'A.name LIKE ?').join(' OR ');
+		nameParams = names.map(name => `%${name}%`);
+	}
+  
+	// TODO: Clean this up
+
+	// Dynamische Query basierend auf ob Namenssuche vorhanden ist
+  let query;
+  let params;
+  
+  // Basis-Query ohne Klammern
+  if (nameConditions) {
+    // Mit Namenssuche
     query = `SELECT * FROM inhabitants A, water_quality B WHERE A.id = B.iid AND (${nameConditions} OR A.type = ? OR A.habitat = ? OR (B.minTemperature >= ? AND B.maxTemperature <= ?) OR (B.minPh >= ? AND B.maxPh <= ?)`;
     params = [...nameParams, type, habitat, temperature[0], temperature[1], phValue[0], phValue[1]];
   } else {
@@ -125,8 +170,13 @@ async function searchInhabitants(searchParams) {
     result = await searchWithNarrowTerms(searchText);
 
     if (result.length == 0) {
-      // 4. Ist wenigstens eine Bedingung wahr?
+      // 4. Wildcards
       result = await searchWithWildcards(names, type, habitat, temperature, phValue, colors);
+
+			if (result.length == 0) {
+				// 5. ist wenigstens eine Bedingung wahr?
+				result = await searchWithOrConstraint(names, type, habitat, temperature, phValue, colors);
+			}
     }
   }
 
