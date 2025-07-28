@@ -87,19 +87,6 @@ const initialColors = {
   bunt: false,
 }
 
-const initialColors = {
-  rot: false,
-  orange: false,
-  gelb: false,
-  grün: false,
-  blau: false,
-  silber: false,
-  schwarz: false,
-  weiß: false,
-  braun: false,
-  bunt: false,
-}
-
 export const SearchForm: React.FC<SearchFormProps> = ({
   onSearch,
   lastSearchParams,
@@ -168,15 +155,6 @@ export const SearchForm: React.FC<SearchFormProps> = ({
         : temperature,
     });
   };
-
-  const handleColorChange = (event: any) => {
-    const {
-      target: { value },
-    } = event
-    setSelectedColors(
-      typeof value === 'string' ? value.split(',') : value,
-    )
-  }
 
   const handleColorChange = (event: any) => {
     const {
