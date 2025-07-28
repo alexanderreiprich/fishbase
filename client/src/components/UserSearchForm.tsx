@@ -34,7 +34,7 @@ export const UserSearchForm: React.FC<UserSearchFormProps> = ({
       searchText: search === "" ? null : search,
       type: null,
       habitat: null,
-      color: null,
+      colors: [],
       salinity: null,
       phValue: [],
       temperature: [],
