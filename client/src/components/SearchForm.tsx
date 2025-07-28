@@ -21,6 +21,7 @@ import { InhabitantType } from "../interfaces/InhabitantType";
 import "../style/SearchForm.css";
 import { SearchOptions } from "../interfaces/SearchOptions";
 
+
 interface SearchFormProps {
   onSearch: (searchParams: SearchOptions) => void;
   lastSearchParams?: SearchOptions;
@@ -86,6 +87,19 @@ const initialColors = {
   bunt: false,
 }
 
+const initialColors = {
+  rot: false,
+  orange: false,
+  gelb: false,
+  grün: false,
+  blau: false,
+  silber: false,
+  schwarz: false,
+  weiß: false,
+  braun: false,
+  bunt: false,
+}
+
 export const SearchForm: React.FC<SearchFormProps> = ({
   onSearch,
   lastSearchParams,
@@ -118,11 +132,11 @@ export const SearchForm: React.FC<SearchFormProps> = ({
             : InhabitantType.PLANT
           : ""
       );
-      setHabitat(lastSearchParams.habitat || "");
-      setSalinity(lastSearchParams.salinity || 0);
-      setPhValue(lastSearchParams.phValue || [0, 5]);
-      setTemperature(lastSearchParams.temperature || [0, 5]);
-      setSelectedColors(lastSearchParams.colors || []);
+      setHabitat(lastSearchParams.habitat || "")
+      setSalinity(lastSearchParams.salinity || 0)
+      setPhValue(lastSearchParams.phValue || [0, 5])
+      setTemperature(lastSearchParams.temperature || [0, 5])
+      setSelectedColors(lastSearchParams.colors || [])
 
       // Erweiterte Suche anzeigen, wenn erweiterte Parameter verwendet wurden
       if (
@@ -154,6 +168,15 @@ export const SearchForm: React.FC<SearchFormProps> = ({
         : temperature,
     });
   };
+
+  const handleColorChange = (event: any) => {
+    const {
+      target: { value },
+    } = event
+    setSelectedColors(
+      typeof value === 'string' ? value.split(',') : value,
+    )
+  }
 
   const handleColorChange = (event: any) => {
     const {
