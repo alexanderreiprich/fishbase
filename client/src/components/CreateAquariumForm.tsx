@@ -60,5 +60,4 @@ export default function CreateAquariumForm() {
       </Button>
     </Box>
 	);
-
 }

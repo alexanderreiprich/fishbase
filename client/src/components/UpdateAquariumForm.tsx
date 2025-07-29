@@ -22,16 +22,6 @@ export default function UpdateAquariumForm() {
 	// eslint-disable-next-line react-hooks/exhaustive-deps
 	}, [user]);
 
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-		setLoading(true);
-    try {
-			navigate("/add");
-    } catch (error) {
-      setFormError("Etwas ist schiefgelaufen, bitte versuche es erneut.")
-    }
-  }
-
   const fetchAquariums = async () => {
 		setLoading(true);
 		try {
@@ -50,8 +40,17 @@ export default function UpdateAquariumForm() {
 		setChosenAquarium(selectedAquarium);
 	};
 
+  const handleEditClick = (event: React.FormEvent) => {
+    event.preventDefault();
+    if (chosenAquarium) {
+      navigate('/edit', { state: { aquarium: chosenAquarium } });
+    } else {
+      setFormError('Bitte wähle ein Aquarium aus.');
+    }
+  };
+
 	return (
-		<Box component="form" className="login-form" sx={{ borderColor: 'var(--primary-main)', p: 2, borderWidth: 2, borderStyle: 'solid' }}>
+		<Box component="form" className="login-form" sx={{ borderColor: 'var(--primary-main)', p: 2, borderWidth: 2, borderStyle: 'solid' }} onSubmit={handleEditClick}>
       <Typography variant="h5" component="h2" gutterBottom>
         Aquarium aktualisieren
       </Typography>
@@ -82,7 +81,14 @@ export default function UpdateAquariumForm() {
             type="submit"
             variant="contained"
             color="secondary"
-            disabled={loading}
+            disabled={loading || !chosenAquarium}
+            sx={{
+              mt: 2,
+              '&.Mui-disabled': {
+                color: 'white',
+                opacity: 0.5 
+              }
+            }}
           >
             {loading ? <CircularProgress size={24} /> : "Aquarium auswählen"}
           </Button>
