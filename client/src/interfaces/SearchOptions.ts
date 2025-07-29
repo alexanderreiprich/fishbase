@@ -16,7 +16,7 @@ export interface SearchOptions {
   type: string | null
   habitat: string | null
   salinity: number | null
-  phValue: number[]
-  temperature: number[]
+  phValue: number[] | null
+  temperature: number[] | null,
   colors: string[]
 }

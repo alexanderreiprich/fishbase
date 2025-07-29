@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react"
+import React, { useState, useEffect } from "react";
 import {
   Box,
   Paper,
@@ -12,16 +12,19 @@ import {
   IconButton,
   InputAdornment,
   Slider,
-  Chip,
+  FormControlLabel,
+  Checkbox,
   OutlinedInput,
-} from "@mui/material"
-import { InhabitantType } from "../interfaces/InhabitantType"
-import "../style/SearchForm.css"
-import { SearchOptions } from "../interfaces/SearchOptions"
+  Chip,
+} from "@mui/material";
+import { InhabitantType } from "../interfaces/InhabitantType";
+import "../style/SearchForm.css";
+import { SearchOptions } from "../interfaces/SearchOptions";
+
 
 interface SearchFormProps {
-  onSearch: (searchParams: SearchOptions) => void
-  lastSearchParams?: SearchOptions
+  onSearch: (searchParams: SearchOptions) => void;
+  lastSearchParams?: SearchOptions;
 }
 
 const salinityMarks = [
@@ -29,8 +32,12 @@ const salinityMarks = [
     value: 0,
     label: "0",
   },
-]
+];
 const temperatureMarks = [
+  {
+    value: 15,
+    label: "15°C",
+  },
   {
     value: 20,
     label: "20°C",
@@ -43,21 +50,29 @@ const temperatureMarks = [
     value: 30,
     label: "30°C",
   },
-]
+];
 const phMarks = [
   {
     value: 5,
     label: "5",
   },
   {
+    value: 6,
+    label: "6",
+  },
+  {
     value: 7,
     label: "7",
+  },
+  {
+    value: 8,
+    label: "8",
   },
   {
     value: 9,
     label: "9",
   },
-]
+];
 
 const initialColors = {
   rot: false,
@@ -76,21 +91,25 @@ export const SearchForm: React.FC<SearchFormProps> = ({
   onSearch,
   lastSearchParams,
 }) => {
-  const [search, setSearch] = useState("")
-  const [showAdvanced, setShowAdvanced] = useState(false)
-  const [type, setType] = useState<InhabitantType | "">("")
-  const [habitat, setHabitat] = useState("")
-  const [salinity, setSalinity] = useState<number>(0)
-  const [phValue, setPhValue] = useState<number[]>([0, 5])
-  const [temperature, setTemperature] = useState<number[]>([0, 5])
+  const [search, setSearch] = useState("");
+  const [showAdvanced, setShowAdvanced] = useState(false);
+  const [type, setType] = useState<InhabitantType | "">("");
+  const [habitat, setHabitat] = useState("");
+  const [salinity, setSalinity] = useState<number>(0);
+  const [phValue, setPhValue] = useState<number[]>([5, 9]);
+  const [temperature, setTemperature] = useState<number[]>([15, 30]);
   const [selectedColors, setSelectedColors] = React.useState<string[]>([])
 
-  const typeStrings = ["fish", "invertebrate", "plant"]
+  // Checkbox States für das Ignorieren von Feldern
+  const [ignorePh, setIgnorePh] = useState(false);
+  const [ignoreTemperature, setIgnoreTemperature] = useState(false);
+
+  const typeStrings = ["fish", "invertebrate", "plant"];
 
   // Wiederherstellen der letzten Suchparameter
   useEffect(() => {
     if (lastSearchParams) {
-      setSearch(lastSearchParams.searchText || "")
+      setSearch(lastSearchParams.searchText || "");
       setType(
         lastSearchParams.type
           ? lastSearchParams.type === "fish"
@@ -99,12 +118,13 @@ export const SearchForm: React.FC<SearchFormProps> = ({
             ? InhabitantType.INVERTEBRATE
             : InhabitantType.PLANT
           : ""
-      )
+      );
       setHabitat(lastSearchParams.habitat || "")
       setSalinity(lastSearchParams.salinity || 0)
       setPhValue(lastSearchParams.phValue || [0, 5])
       setTemperature(lastSearchParams.temperature || [0, 5])
       setSelectedColors(lastSearchParams.colors || [])
+
       // Erweiterte Suche anzeigen, wenn erweiterte Parameter verwendet wurden
       if (
         lastSearchParams.habitat ||
@@ -114,23 +134,27 @@ export const SearchForm: React.FC<SearchFormProps> = ({
         lastSearchParams.type ||
         lastSearchParams.colors
       ) {
-        setShowAdvanced(true)
+        setShowAdvanced(true);
       }
     }
-  }, [lastSearchParams])
+  }, [lastSearchParams]);
 
   const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault()
+    e.preventDefault();
     onSearch({
       searchText: search === "" ? null : search,
       type: type === "" ? null : typeStrings[type as number],
       habitat: habitat === "" ? null : habitat,
-      salinity: !salinity ? 0 : salinity,
-      phValue: !phValue.length ? [0, 1] : phValue,
-      temperature: !temperature.length ? [0, 1] : temperature,
       colors: selectedColors,
-    })
-  }
+      salinity: !salinity ? 0 : salinity,
+      phValue: ignorePh ? [0, 1] : !phValue.length ? [0, 1] : phValue,
+      temperature: ignoreTemperature
+        ? [0, 1]
+        : !temperature.length
+        ? [0, 1]
+        : temperature,
+    });
+  };
 
   const handleColorChange = (event: any) => {
     const {
@@ -241,7 +265,9 @@ export const SearchForm: React.FC<SearchFormProps> = ({
                   Wasserqualität:
                 </Typography>
               </Grid>
-              <Grid size={{ xs: 12 }}>
+              {
+                // Disabled due to salinity always being zero
+                /* <Grid size={{ xs: 12 }}>
                 <Typography
                   className="searchform-label"
                   style={{ marginBottom: "8px", fontWeight: "regular" }}
@@ -258,7 +284,8 @@ export const SearchForm: React.FC<SearchFormProps> = ({
                   valueLabelDisplay="auto"
                   marks={salinityMarks}
                 />
-              </Grid>
+              </Grid> */
+              }
               <Grid size={{ xs: 12 }}>
                 <Typography
                   className="searchform-label"
@@ -275,7 +302,22 @@ export const SearchForm: React.FC<SearchFormProps> = ({
                   valueLabelDisplay="auto"
                   step={0.5}
                   marks={phMarks}
+                  disabled={ignorePh}
                 />
+                <Box
+                  sx={{ display: "flex", alignItems: "center", gap: 1, mb: 1 }}
+                >
+                  <FormControlLabel
+                    control={
+                      <Checkbox
+                        checked={ignorePh}
+                        onChange={(e) => setIgnorePh(e.target.checked)}
+                        size="small"
+                      />
+                    }
+                    label="PH-Wert ignorieren"
+                  />
+                </Box>
               </Grid>
               <Grid size={{ xs: 12 }}>
                 <Typography
@@ -285,7 +327,7 @@ export const SearchForm: React.FC<SearchFormProps> = ({
                   Temperatur:
                 </Typography>
                 <Slider
-                  min={20}
+                  min={15}
                   max={30}
                   getAriaLabel={() => "Temperature range"}
                   value={temperature}
@@ -294,12 +336,27 @@ export const SearchForm: React.FC<SearchFormProps> = ({
                   }
                   valueLabelDisplay="auto"
                   marks={temperatureMarks}
+                  disabled={ignoreTemperature}
                 />
+                <Box
+                  sx={{ display: "flex", alignItems: "center", gap: 1, mb: 1 }}
+                >
+                  <FormControlLabel
+                    control={
+                      <Checkbox
+                        checked={ignoreTemperature}
+                        onChange={(e) => setIgnoreTemperature(e.target.checked)}
+                        size="small"
+                      />
+                    }
+                    label="Temperatur ignorieren"
+                  />
+                </Box>
               </Grid>
             </>
           )}
         </Grid>
       </Box>
     </Paper>
-  )
-}
+  );
+};
