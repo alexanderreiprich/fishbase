@@ -36,16 +36,37 @@ async function getSynonymsAndNames(searchText) {
 }
 
 async function searchWithExactMatch(names, type, habitat, temperature, phValue, colors) {
-  // Dynamische Query basierend auf colors
-  let query = `SELECT * FROM inhabitants A, water_quality B WHERE A.id = B.iid AND (A.name IN (${names.map(() => '?').join(',')}) AND A.type=? AND A.habitat=? AND B.minTemperature >= ? AND B.maxTemperature <= ? AND B.minPh >= ? AND B.maxPh <= ?)`;
-  let params = [...names, type, habitat, temperature[0], temperature[1], phValue[0], phValue[1]]
+  // Dynamische Query basierend auf ausgefüllten Feldern
+  let whereClauses = ["A.id = B.iid"];
+  let params = [];
 
-  if (colors && colors.length > 0) {
-    const colorConditions = colors.map(() => 'color LIKE ?').join(' OR ')
-    query += ` AND (${colorConditions})`
-    params.push(...colors.map(color => `%${color}%`))
+  if (names && names.length > 0 && names[0] != null) {
+    whereClauses.push(`A.name IN (${names.map(() => '?').join(',')})`);
+    params.push(...names);
   }
-  
+  if (temperature && temperature.length === 2 && temperature[0] != null && temperature[1] != null) {
+    whereClauses.push("B.minTemperature >= ? AND B.maxTemperature <= ?");
+    params.push(temperature[0], temperature[1]);
+  }
+  if (phValue && phValue.length === 2 && phValue[0] != null && phValue[1] != null) {
+    whereClauses.push("B.minPh >= ? AND B.maxPh <= ?");
+    params.push(phValue[0], phValue[1]);
+  }
+  if (colors && colors.length > 0) {
+    const colorConditions = colors.map(() => 'A.color LIKE ?').join(' OR ');
+    whereClauses.push(`(${colorConditions})`);
+    params.push(...colors.map(color => `%${color}%`));
+  }
+  if (type) {
+    whereClauses.push("A.type = ?");
+    params.push(type);
+  }
+  if (habitat) {
+    whereClauses.push("A.habitat = ?");
+    params.push(habitat);
+  }
+
+  let query = `SELECT * FROM inhabitants A, water_quality B WHERE ${whereClauses.join(' AND ')}`;
   const [inhabitants] = await pool.query(query, params);
   return inhabitants;
 }
@@ -66,90 +87,72 @@ async function searchWithNarrowTerms(searchText) {
 }
 
 async function searchWithWildcards(names, type, habitat, temperature, phValue, colors) {
-  // Erstelle Wildcard-Bedingungen für alle Namen
-	let nameConditions = "";
-	let nameParams = [];
-	if (names[0] == null) {
-		// Keine Namenssuche - nur andere Kriterien
-		nameConditions = "";
-	}
-	else {
-		nameConditions = names.map(() => 'A.name LIKE ?').join(' OR ');
-		nameParams = names.map(name => `%${name}%`);
-	}
-  
-	// TODO: Clean this up
+  let whereClauses = ["A.id = B.iid"];
+  let params = [];
 
-	// Dynamische Query basierend auf ob Namenssuche vorhanden ist
-  let query;
-  let params;
-  
-  // Basis-Query ohne Klammern
-  if (nameConditions) {
-    // Mit Namenssuche
-    query = `SELECT * FROM inhabitants A, water_quality B WHERE A.id = B.iid AND ${nameConditions}`;
-    params = [...nameParams];
-  } else {
-    // Nur andere Kriterien
-    query = `SELECT * FROM inhabitants A, water_quality B WHERE A.id = B.iid AND (A.type = ? OR A.habitat = ? OR (B.minTemperature >= ? AND B.maxTemperature <= ?) OR (B.minPh >= ? AND B.maxPh <= ?)`;
-    params = [type, habitat, temperature[0], temperature[1], phValue[0], phValue[1]];
+  if (names && names.length > 0 && names[0] != null) {
+    const nameConditions = names.map(() => 'A.name LIKE ?').join(' OR ');
+    whereClauses.push(`(${nameConditions})`);
+    params.push(...names.map(name => `%${name}%`));
+  }
+  if (temperature && temperature.length === 2 && temperature[0] != 0 && temperature[1] != 1) {
+    whereClauses.push("B.minTemperature >= ? AND B.maxTemperature <= ?");
+    params.push(temperature[0], temperature[1]);
+  }
+  if (phValue && phValue.length === 2 && phValue[0] != 0 && phValue[1] != 1) {
+    whereClauses.push("B.minPh >= ? AND B.maxPh <= ?");
+    params.push(phValue[0], phValue[1]);
+  }
+  if (colors && colors.length > 0) {
+    const colorConditions = colors.map(() => 'A.color LIKE ?').join(' OR ');
+    whereClauses.push(`(${colorConditions})`);
+    params.push(...colors.map(color => `%${color}%`));
+  }
+  if (type) {
+    whereClauses.push("A.type = ?");
+    params.push(type);
+  }
+  if (habitat) {
+    whereClauses.push("A.habitat = ?");
+    params.push(habitat);
+  }
 
-		// Farben hinzufügen
-		if (colors && colors.length > 0) {
-			const colorConditions = colors.map(() => 'A.color LIKE ?').join(' OR ')
-			query += ` OR (${colorConditions})`
-			params.push(...colors.map(color => `%${color}%`))
-		}
-		
-		// Klammer schließen
-		query += `)`
-  } 
-
-  
+  let query = `SELECT * FROM inhabitants A, water_quality B WHERE ${whereClauses.join(' AND ')}`;
   const [inhabitants] = await pool.query(query, params);
   return inhabitants;
 }
 
 async function searchWithOrConstraint(names, type, habitat, temperature, phValue, colors) {
-  // Erstelle Wildcard-Bedingungen für alle Namen
-	let nameConditions = "";
-	let nameParams = [];
-	if (names[0] == null) {
-		// Keine Namenssuche - nur andere Kriterien
-		nameConditions = "";
-	}
-	else {
-		nameConditions = names.map(() => 'A.name LIKE ?').join(' OR ');
-		nameParams = names.map(name => `%${name}%`);
-	}
-  
-	// TODO: Clean this up
+  let whereClauses = ["A.id = B.iid"];
+  let orConditions = [];
+  let params = [];
 
-	// Dynamische Query basierend auf ob Namenssuche vorhanden ist
-  let query;
-  let params;
-  
-  // Basis-Query ohne Klammern
-  if (nameConditions) {
-    // Mit Namenssuche
-    query = `SELECT * FROM inhabitants A, water_quality B WHERE A.id = B.iid AND (${nameConditions} OR A.type = ? OR A.habitat = ? OR (B.minTemperature >= ? AND B.maxTemperature <= ?) OR (B.minPh >= ? AND B.maxPh <= ?)`;
-    params = [...nameParams, type, habitat, temperature[0], temperature[1], phValue[0], phValue[1]];
-  } else {
-    // Nur andere Kriterien
-    query = `SELECT * FROM inhabitants A, water_quality B WHERE A.id = B.iid AND (A.type = ? OR A.habitat = ? OR (B.minTemperature >= ? AND B.maxTemperature <= ?) OR (B.minPh >= ? AND B.maxPh <= ?)`;
-    params = [type, habitat, temperature[0], temperature[1], phValue[0], phValue[1]];
+  if (names && names.length > 0 && names[0] != null) {
+    whereClauses.push(names.map(() => 'A.name LIKE ?'));
+    params.push(...names.map(name => `%${name}%`));
   }
-
-  // Farben hinzufügen
+  if (temperature && temperature.length === 2 && temperature[0] != null && temperature[1] != null) {
+    orConditions.push("(B.minTemperature >= ? AND B.maxTemperature <= ?)");
+    params.push(temperature[0], temperature[1]);
+  }
+  if (phValue && phValue.length === 2 && phValue[0] != null && phValue[1] != null) {
+    orConditions.push("(B.minPh >= ? AND B.maxPh <= ?)");
+    params.push(phValue[0], phValue[1]);
+  }
   if (colors && colors.length > 0) {
-    const colorConditions = colors.map(() => 'A.color LIKE ?').join(' OR ')
-    query += ` OR (${colorConditions})`
-    params.push(...colors.map(color => `%${color}%`))
+    orConditions.push(colors.map(() => 'A.color LIKE ?').join(' OR '));
+    params.push(...colors.map(color => `%${color}%`));
   }
-  
-  // Klammer schließen
-  query += `)`
-  
+  if (type) {
+    orConditions.push("A.type = ?");
+    params.push(type);
+  }
+  if (habitat) {
+    orConditions.push("A.habitat = ?");
+    params.push(habitat);
+  }
+
+  let query = `SELECT * FROM inhabitants A, water_quality B WHERE ${whereClauses.join(' AND ')} AND (${orConditions.join(' OR ')})`;
   const [inhabitants] = await pool.query(query, params);
   return inhabitants;
 }
@@ -166,7 +169,7 @@ async function searchInhabitants(searchParams) {
   result = await searchWithExactMatch(names, type, habitat, temperature, phValue, colors);
 
   if (result.length == 0) {
-    // 3. Fuzzy Search und Stemsearch, Narrow Term
+    // 3. Narrow Term
     result = await searchWithNarrowTerms(searchText);
 
     if (result.length == 0) {
@@ -174,7 +177,7 @@ async function searchInhabitants(searchParams) {
       result = await searchWithWildcards(names, type, habitat, temperature, phValue, colors);
 
 			if (result.length == 0) {
-				// 5. ist wenigstens eine Bedingung wahr?
+				// 5. Ist wenigstens eine Bedingung wahr?
 				result = await searchWithOrConstraint(names, type, habitat, temperature, phValue, colors);
 			}
     }
