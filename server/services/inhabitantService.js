@@ -15,10 +15,10 @@ async function getSynonymsAndNames(searchText) {
     termIds.push(termRows[0].id);
     console.log('id at termids index 0 ', termIds[0]);
     const [synonymRows] = await pool.query(
-      'SELECT symid FROM synonym WHERE termid = ? UNION SELECT termid FROM synonyms WHERE symid = ?',
+      'SELECT symid FROM synonym WHERE termid = ? UNION SELECT termid FROM synonym WHERE symid = ?',
       [termIds[0], termRows[0].id]
     );
-    synonymRows.forEach((row) => termIds.push(row.symId || row.termid));
+    synonymRows.forEach(row => termIds.push(row.symId || row.termid));
   }
   console.log('termIds: ', termIds);
 
@@ -31,7 +31,7 @@ async function getSynonymsAndNames(searchText) {
         .join(',')})`,
       termIds
     );
-    names = nameRows.map((row) => row.term);
+    names = nameRows.map((row) => row.expression);
   }
 
   return names;

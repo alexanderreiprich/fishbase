@@ -61,6 +61,40 @@ router.get("/:id", async (req, res) => {
   }
 })
 
+// Abfrage, welche Predators der Inhabitant hat
+router.get("/predators/:id", async (req, res) => {
+  try {
+    const { id } = req.params;
+    console.log(`Route predators/:id wurde aufgerufen mit ID: ${id}`);
+    const [predators] = await pool.query(
+      "SELECT i.* FROM predators p JOIN inhabitants i ON p.predator = i.id WHERE p.victim = ?",
+      [id]
+    );
+
+    res.status(200).json(predators);
+  } catch (error) {
+    console.error("API-Fehler:", error);
+    res.status(500).json({ message: "Serverfehler bei Abfrage der Predators" });
+  }
+});
+
+// Abfrage, welche Victims der Inhabitant hat
+router.get("/victims/:id", async (req, res) => {
+  try {
+    const { id } = req.params;
+    console.log(`Route victims/:id wurde aufgerufen mit ID: ${id}`);
+    const [victims] = await pool.query(
+      "SELECT i.* FROM predators p JOIN inhabitants i ON p.victim = i.id WHERE p.predator = ?",
+      [id]
+    );
+
+    res.status(200).json(victims);
+  } catch (error) {
+    console.error("API-Fehler:", error);
+    res.status(500).json({ message: "Serverfehler bei Abfrage der Victims" });
+  }
+});
+
 // Inhabitant abfragen
 router.post("/search", async (req, res) => {
   try {

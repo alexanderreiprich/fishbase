@@ -140,7 +140,8 @@ export const SearchForm: React.FC<SearchFormProps> = ({
   }, [lastSearchParams]);
 
   const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
+    e.preventDefault()
+    e.stopPropagation()
     onSearch({
       searchText: search === "" ? null : search,
       type: type === "" ? null : typeStrings[type as number],

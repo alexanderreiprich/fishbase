@@ -37,7 +37,7 @@ const ListPage: React.FC = () => {
       <Grid container spacing={1}>
         {inhabitants.map((inhabitant, index) => (
           inhabitant.type === InhabitantType.FISH || inhabitant.type === InhabitantType.INVERTEBRATE ? (
-            <AnimalCard key={index} animal={inhabitant as Animal} />
+            <AnimalCard key={index} animal={inhabitant as Animal} isPredatorConflict={false} />
           ) : (
             <PlantCard key={index} plant={inhabitant as Plant} />
           )
