@@ -4,7 +4,8 @@ import { InhabitantRepository } from "./InhabitantRepository"
 
 interface ApiAquarium {
 	id: number,
-	userId: number,
+	userid: number,
+	waterqualityid: number
 	name: string,
 	capacity: number,
 	inhabitants: string
@@ -59,7 +60,7 @@ export class AquariumRepository {
 	public async createAquarium(userId: number, capacity: number, name: string): Promise<void> {
 		try {
       const token = localStorage.getItem("token")
-      const response = await fetch(`${this.baseUrl}/user/${userId}`, {
+      const response = await fetch(`${this.baseUrl}/user/create/${userId}`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -73,6 +74,26 @@ export class AquariumRepository {
 		} catch (error) {
 			console.error("Fehler beim Erstelles des Aquariums:", error)
       throw error;
+		}
+	}
+
+	public async updateAquarium(tank: Aquarium, inhabitants: Inhabitant[]): Promise<void> {
+		try {
+			const token = localStorage.getItem("token")
+      const response = await fetch(`${this.baseUrl}/user/update`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
+        },
+        body: JSON.stringify({ id: tank.id , userId: tank.userId, waterQualityId: tank.waterQualityId, capacity: tank.capacity, name: tank.name, newInhabitants: inhabitants }),
+      })
+      if (!response.ok) {
+        throw new Error("Fehler beim Aktualisieren des Aquariums");
+      }
+		} catch (error) {
+			console.error("Fehler beim Aktualisieren des Aquariums");
+			throw error;
 		}
 	}
 
@@ -101,7 +122,8 @@ export class AquariumRepository {
 	private async transformToAquarium(apiData: ApiAquarium): Promise<Aquarium> {
     const cleanedAquarium = {
 			id: apiData.id,
-			userId: apiData.userId,
+			userId: apiData.userid,
+			waterQualityId: apiData.waterqualityid,
 			capacity: apiData.capacity,
 			name: apiData.name,
 			inhabitants: await this.parseInhabitants(apiData.inhabitants)

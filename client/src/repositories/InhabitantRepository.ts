@@ -204,6 +204,7 @@ export class InhabitantRepository {
     return {
       region: region,
       waterQuality: {
+        id: 0,
         salinity: 1.0,
         temperature: 25,
         ph: 7.0,

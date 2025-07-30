@@ -3,11 +3,11 @@ const router = express.Router();
 const pool = require('../config/db');
 
 // Hinzufügen eines neuen Aquariums
-router.post('/user/:id', async (req, res) => {
+router.post('/user/create/:id', async (req, res) => {
   try {
 		const { id } = req.params;
     const { capacity, name } = req.body;
-		console.log(`Route POST aquariums/user/:id wurde aufgerufen mit ID: ${id}`);
+		console.log(`Route POST aquariums/user/create/:id wurde aufgerufen mit ID: ${id}`);
 
     const [result] = await pool.query(
       'INSERT INTO aquariums (userid, waterqualityid, capacity, name) VALUES (?, ?, ?, ?)',
@@ -20,6 +20,91 @@ router.post('/user/:id', async (req, res) => {
   } catch (error) {
     console.error('Fehler:', error);
     res.status(500).json({ message: 'Serverfehler bei der Aquarienerstellung' });
+  }
+});
+
+// Aktualisieren eines Aquariums
+router.post('/user/update', async (req, res) => {
+  try {
+    const tank = req.body;
+    console.log(`Route POST aquariums/user/update wurde aufgerufen`);
+
+    // Aktualisieren der Wasserqualität
+    // Hole die aktuelle Wasserqualität des Aquariums
+    const [currentAquarium] = await pool.query(
+      'SELECT waterqualityid FROM aquariums WHERE id = ?',
+      [tank.id]
+    );
+
+    const currentWaterQualityId = currentAquarium[0]?.waterqualityid;
+
+    // Hole alle aktuellen Inhabitants des Aquariums
+    const [currentInhabitants] = await pool.query(
+      'SELECT iid FROM inhabitants_aquariums WHERE aid = ?',
+      [tank.id]
+    );
+
+    // Hole die iid des ursprünglichen Fisches
+    const [originalFishData] = await pool.query(
+      'SELECT iid FROM water_quality WHERE wid = ?',
+      [currentWaterQualityId]
+    );
+
+    const originalFishIid = originalFishData[0]?.iid;
+
+    // Prüfe ob der ursprüngliche Fisch noch im Aquarium ist
+    const originalFishStillExists = currentInhabitants.some(inhabitant => 
+      inhabitant.iid === originalFishIid
+    );
+
+    let newWaterQualityId = tank.waterQualityId;
+    const newInhabitants = tank.newInhabitants;
+
+    // Wenn der ursprüngliche Fisch nicht mehr da ist und neue Inhabitants vorhanden sind
+    if (!originalFishStillExists && newInhabitants && newInhabitants.length > 0) {
+      // Nimm den ersten Fisch als neue Wasserqualität
+      const firstInhabitantId = newInhabitants[0].id;
+      
+      // Hole die Wasserqualität des ersten Inhabitants
+      const [newWaterQuality] = await pool.query(
+        'SELECT wid FROM water_quality WHERE iid = ?',
+        [firstInhabitantId]
+      );
+
+      if (newWaterQuality.length > 0) {
+        newWaterQualityId = newWaterQuality[0].wid;
+      }
+    }
+    // Ist der ursprüngliche Fisch noch da, behalte die aktuelle Qualität bei
+
+    const [tankResult] = await pool.query(
+      'UPDATE aquariums SET userid = ?, waterqualityid = ?, capacity = ?, name = ? WHERE id = ?',
+      [tank.userId, newWaterQualityId, tank.capacity, tank.name, tank.id]
+    );
+
+    const [deleteInhabitantsResult] = await pool.query(
+      'DELETE FROM inhabitants_aquariums WHERE aid = ?',
+      [tank.id]
+    );
+
+    if (newInhabitants && newInhabitants.length > 0) {
+      const placeholders = newInhabitants.map(() => '(?, ?, ?)').join(', ');
+      const params = newInhabitants.flatMap(inhabitant => [
+        inhabitant.id, 
+        tank.id, 
+        inhabitant.quantity
+      ]);
+
+      const insertQuery = `INSERT INTO inhabitants_aquariums (iid, aid, amount) VALUES ${placeholders}`;
+
+      const [newInhabitantsResult] = await pool.query(insertQuery, params);
+    }
+
+    res.status(200).json(tankResult);
+
+  } catch (error) {
+    console.error('Fehler:', error);
+    res.status(500).json({ message: 'Serverfehler bei der Aquarienaktualisierung' });
   }
 });
 
@@ -46,14 +131,12 @@ router.get('/user/:id', async (req, res) => {
 				
 				// Inhabitant-IDs als kommagetrennten String erstellen
 				const inhabitantIds = inhabitants.map(inh => inh.iid).join(',');
-				
 				return {
 					...aquarium,
 					inhabitants: inhabitantIds
 				};
 			})
 		);
-
 		res.status(200).json(aquariumsWithInhabitants);
 
 	} catch (error) {
