@@ -32,11 +32,19 @@ export default function PlantCard({
 
   return (
     <>
-      <Card variant="outlined">
+      <Card 
+      variant="outlined"
+      sx={{
+        maxWidth: 500,
+        position: "relative",
+        borderColor: "var(--primary-main)",
+        borderWidth: 1,
+      }}
+      >
         <CardMedia
           image={plant.image ? URL.createObjectURL(plant.image) : ""}
           title={plant.name}
-          sx={{ height: 140 }}
+          sx={{ height: 240 }}
         />
         <CardContent>
           <Typography gutterBottom sx={{ fontSize: 14 }}>
@@ -46,7 +54,6 @@ export default function PlantCard({
             {plant.name}
           </Typography>
           <Typography sx={{ mb: 1.5 }}>Pflanze</Typography>
-          {/* TODO: fix display of order and displayed information */}
           Habitat: {plant.habitat.region} |{" "}
           {plant.habitat.waterQuality.temperature}°C
         </CardContent>

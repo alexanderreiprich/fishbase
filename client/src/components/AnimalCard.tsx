@@ -73,7 +73,7 @@ export default function AnimalCard({
       <Card
         variant="outlined"
         sx={{
-          maxWidth: 300,
+          maxWidth: 500,
           position: "relative",
           borderColor: isPredatorConflict ? "red" : "var(--primary-main)",
           borderWidth: isPredatorConflict ? 2 : 1,
@@ -99,7 +99,7 @@ export default function AnimalCard({
         <CardMedia
           image={animal.image ? URL.createObjectURL(animal.image) : ""}
           title={animal.name}
-          sx={{ height: 140 }}
+          sx={{ height: 240 }}
         />
         <CardContent>
           <Typography gutterBottom sx={{ fontSize: 14 }}>
@@ -109,7 +109,6 @@ export default function AnimalCard({
             {animal.name}
           </Typography>
           <Typography sx={{ mb: 1.5 }}>{getAnimalType()}</Typography>
-          {/* TODO: fix display of order and displayed information */}
           Habitat: {animal.habitat.region} |{" "}
           {animal.habitat.waterQuality.temperature}°C
           {isPredatorConflict ? (
