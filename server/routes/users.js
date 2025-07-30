@@ -99,7 +99,7 @@ router.post('/search', async (req, res) => {
     const { searchText } = req.body;
 
     const [users] = await pool.query(
-      'SELECT id, picture, username, favoritefish, tank FROM users WHERE username LIKE ?',
+      'SELECT id, picture, username, favoritefish, tank FROM user WHERE username LIKE ?',
       [`%${searchText}%`]
     );
     if (users.length == 0) {
@@ -247,7 +247,7 @@ router.put('/profile/aquarium', async (req, res) => {
     const imageBuffer = Buffer.from(aquarium, 'base64');
 
     // Bild in der Datenbank aktualisieren
-    await pool.query('UPDATE users SET tank = ? WHERE id = ?', [
+    await pool.query('UPDATE user SET tank = ? WHERE id = ?', [
       imageBuffer,
       decoded.userId,
     ]);

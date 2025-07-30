@@ -25,8 +25,11 @@ DROP TABLE IF EXISTS tank;
 CREATE TABLE tank (
   id SMALLINT PRIMARY KEY AUTO_INCREMENT,
   userid SMALLINT NOT NULL,
+  waterqualityid SMALLINT NOT NULL,
   name VARCHAR(50) NOT NULL,
-  FOREIGN KEY (userid) REFERENCES users(id)
+  capacity INT NOT NULL,
+  FOREIGN KEY (userid) REFERENCES user(id),
+  FOREIGN KEY (waterqualityid) REFERENCES water_quality(id)
 );
 
 DROP TABLE IF EXISTS inhabitant;
@@ -51,29 +54,17 @@ DROP TABLE IF EXISTS water_quality;
 
 -- wasserqualitäten, wird referenziert von habitat
 CREATE TABLE water_quality (
-  wid SMALLINT,
-  iid SMALLINT,
-  salinity DECIMAL,
-  minTemperature DECIMAL,
-  maxTemperature DECIMAL,
+  id SMALLINT,
+  inhabitantId SMALLINT,
+  salinity FLOAT,
+  minTemperature FLOAT,
+  maxTemperature FLOAT,
   minPh FLOAT,
-  maxPh FLOAT,
-  FOREIGN KEY (iid) REFERENCES inhabitants(id),
-  PRIMARY KEY (wid)
+  maxPh FLOAT,  
+  PRIMARY KEY (id, inhabitantId),
+  FOREIGN KEY (inhabitantId) REFERENCES inhabitant(id)
 );
 
-DROP TABLE IF EXISTS aquariums;
-
--- aquarientabelle erstellen
-CREATE TABLE aquariums (
-  id SMALLINT PRIMARY KEY AUTO_INCREMENT,
-  userid SMALLINT NOT NULL,
-  waterqualityid SMALLINT NOT NULL,
-  name VARCHAR(50) NOT NULL,
-  capacity INT NOT NULL,
-  FOREIGN KEY (userid) REFERENCES users(id),
-  FOREIGN KEY (waterqualityid) REFERENCES water_quality(wid)
-);
 
 DROP TABLE IF EXISTS predator;
 
@@ -398,21 +389,6 @@ INSERT INTO synonym(termid, symid) VALUES
   (82, 42),  
   (83, 43);  
   
-DROP TABLE IF EXISTS water_quality;
-
--- wasserqualitäten, wird referenziert von habitat
-CREATE TABLE water_quality (
-  id SMALLINT,
-  inhabitantId SMALLINT,
-  salinity FLOAT,
-  minTemperature FLOAT,
-  maxTemperature FLOAT,
-  minPh FLOAT,
-  maxPh FLOAT,
-  FOREIGN KEY (inhabitantId) REFERENCES inhabitant(id),
-  PRIMARY KEY (inhabitantId, id)
-);
-
 -- wasserqualitäten pro fisch
 INSERT INTO water_quality (id, inhabitantId, salinity, minTemperature, maxTemperature, minPh, maxPh) VALUES 
 (0,(SELECT id FROM inhabitant WHERE name='Neonfisch'), 0, 22, 25, 6.0, 7.0),
@@ -518,12 +494,5 @@ INSERT INTO water_quality (id, inhabitantId, salinity, minTemperature, maxTemper
 (96,(SELECT id FROM inhabitant WHERE name='Myriophyllum tuberculatum'),0,22,28,6.0,7.0),
 (97,(SELECT id FROM inhabitant WHERE name='Cabomba caroliniana'),0,22,28,6.0,7.5);
 
-
--- TODO: INSERT INTO inhabitant WHERE id = water_quality.iid (id AS water_quality) VALUES
-
-
-
-
--- nachher ausführbar mit mysql -u root -p fishbase
 SET FOREIGN_KEY_CHECKS = 1;
 COMMIT;

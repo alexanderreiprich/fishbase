@@ -10,7 +10,7 @@ router.post('/user/create/:id', async (req, res) => {
 		console.log(`Route POST aquariums/user/create/:id wurde aufgerufen mit ID: ${id}`);
 
     const [result] = await pool.query(
-      'INSERT INTO aquariums (userid, waterqualityid, capacity, name) VALUES (?, ?, ?, ?)',
+      'INSERT INTO tank (userid, waterqualityid, capacity, name) VALUES (?, ?, ?, ?)',
       [id, 0, capacity, name]
     );
 
@@ -32,7 +32,7 @@ router.post('/user/update', async (req, res) => {
     // Aktualisieren der Wasserqualität
     // Hole die aktuelle Wasserqualität des Aquariums
     const [currentAquarium] = await pool.query(
-      'SELECT waterqualityid FROM aquariums WHERE id = ?',
+      'SELECT waterqualityid FROM tank WHERE id = ?',
       [tank.id]
     );
 
@@ -40,21 +40,21 @@ router.post('/user/update', async (req, res) => {
 
     // Hole alle aktuellen Inhabitants des Aquariums
     const [currentInhabitants] = await pool.query(
-      'SELECT iid FROM inhabitants_aquariums WHERE aid = ?',
+      'SELECT inhabitantId FROM tank_inhabitant WHERE tankId = ?',
       [tank.id]
     );
 
     // Hole die iid des ursprünglichen Fisches
     const [originalFishData] = await pool.query(
-      'SELECT iid FROM water_quality WHERE wid = ?',
+      'SELECT inhabitantId FROM water_quality WHERE id = ?',
       [currentWaterQualityId]
     );
 
-    const originalFishIid = originalFishData[0]?.iid;
+    const originalFishIid = originalFishData[0]?.inhabitantId;
 
     // Prüfe ob der ursprüngliche Fisch noch im Aquarium ist
     const originalFishStillExists = currentInhabitants.some(inhabitant => 
-      inhabitant.iid === originalFishIid
+      inhabitant.inhabitantId === originalFishIid
     );
 
     let newWaterQualityId = tank.waterQualityId;
@@ -67,23 +67,23 @@ router.post('/user/update', async (req, res) => {
       
       // Hole die Wasserqualität des ersten Inhabitants
       const [newWaterQuality] = await pool.query(
-        'SELECT wid FROM water_quality WHERE iid = ?',
+        'SELECT id FROM water_quality WHERE inhabitantId = ?',
         [firstInhabitantId]
       );
 
       if (newWaterQuality.length > 0) {
-        newWaterQualityId = newWaterQuality[0].wid;
+        newWaterQualityId = newWaterQuality[0].id;
       }
     }
     // Ist der ursprüngliche Fisch noch da, behalte die aktuelle Qualität bei
 
     const [tankResult] = await pool.query(
-      'UPDATE aquariums SET userid = ?, waterqualityid = ?, capacity = ?, name = ? WHERE id = ?',
+      'UPDATE tank SET userid = ?, waterqualityid = ?, capacity = ?, name = ? WHERE id = ?',
       [tank.userId, newWaterQualityId, tank.capacity, tank.name, tank.id]
     );
 
     const [deleteInhabitantsResult] = await pool.query(
-      'DELETE FROM inhabitants_aquariums WHERE aid = ?',
+      'DELETE FROM tank_inhabitant WHERE tankId = ?',
       [tank.id]
     );
 
@@ -95,7 +95,7 @@ router.post('/user/update', async (req, res) => {
         inhabitant.quantity
       ]);
 
-      const insertQuery = `INSERT INTO inhabitants_aquariums (iid, aid, amount) VALUES ${placeholders}`;
+      const insertQuery = `INSERT INTO tank_inhabitant (inhabitantId, tankId, amount) VALUES ${placeholders}`;
 
       const [newInhabitantsResult] = await pool.query(insertQuery, params);
     }
@@ -114,7 +114,7 @@ router.get('/user/:id', async (req, res) => {
 		const { id } = req.params;
 		console.log(`Route GET aquariums/user/:id wurde aufgerufen mit ID: ${id}`);
     const [aquariums] = await pool.query(
-      "SELECT * FROM aquariums WHERE userid = ?",
+      "SELECT * FROM tank WHERE userid = ?",
       [id]
     );
 		if (aquariums.length === 0) {
@@ -125,12 +125,12 @@ router.get('/user/:id', async (req, res) => {
 		const aquariumsWithInhabitants = await Promise.all(
 			aquariums.map(async (aquarium) => {
 				const [inhabitants] = await pool.query(
-					"SELECT iid, amount FROM inhabitants_aquariums WHERE aid = ?",
+					"SELECT inhabitantId, amount FROM tank_inhabitant WHERE tankId = ?",
 					[aquarium.id]
 				);
 				
 				// Inhabitant-IDs als kommagetrennten String erstellen
-				const inhabitantIds = inhabitants.map(inh => inh.iid).join(',');
+				const inhabitantIds = inhabitants.map(inh => inh.inhabitantId).join(',');
 				return {
 					...aquarium,
 					inhabitants: inhabitantIds
@@ -153,7 +153,7 @@ router.post('/add', async (req, res) => {
 
     // Prüfen ob das Aquarium existiert
     const [aquarium] = await pool.query(
-      'SELECT * FROM aquariums WHERE id = ?',
+      'SELECT * FROM tank WHERE id = ?',
       [aquariumId]
     );
 
@@ -163,7 +163,7 @@ router.post('/add', async (req, res) => {
 
     // Prüfen ob der Inhabitant existiert
     const [inhabitant] = await pool.query(
-      'SELECT * FROM inhabitants WHERE id = ?',
+      'SELECT * FROM inhabitant WHERE id = ?',
       [inhabitantId]
     );
 
@@ -173,41 +173,41 @@ router.post('/add', async (req, res) => {
 
     // Prüfen ob es der erste Inhabitant ist
     const [amountOfInhabitants] = await pool.query(
-      'SELECT * FROM inhabitants_aquariums WHERE aid = ?',
+      'SELECT * FROM tank_inhabitant WHERE tankId = ?',
       [aquariumId]
     );
 
     if (amountOfInhabitants.length === 0) {
       // Hole die waterqualityid (wid) des Inhabitants
       const [inhabitantRows] = await pool.query(
-        'SELECT wid FROM water_quality WHERE iid = ?',
+        'SELECT id FROM water_quality WHERE inhabitantId = ?',
         [inhabitantId]
       );
       if (inhabitantRows.length > 0) {
-        const wid = inhabitantRows[0].wid;
+        const id = inhabitantRows[0].id;
         await pool.query(
-          'UPDATE aquariums SET waterqualityid = ? WHERE id = ?',
-          [wid, aquariumId]
+          'UPDATE tank SET waterqualityid = ? WHERE id = ?',
+          [id, aquariumId]
         );
       }
     }
 
     // Prüfen ob die Beziehung bereits existiert
     const [existingRelation] = await pool.query(
-      'SELECT * FROM inhabitants_aquariums WHERE iid = ? AND aid = ?',
+      'SELECT * FROM tank_inhabitant WHERE inhabitantId = ? AND tankId = ?',
       [inhabitantId, aquariumId]
     );
 
     if (existingRelation.length > 0) {
       // Wenn bereits vorhanden, Menge aktualisieren
       await pool.query(
-        'UPDATE inhabitants_aquariums SET amount = amount + ? WHERE iid = ? AND aid = ?',
+        'UPDATE tank_inhabitant SET amount = amount + ? WHERE inhabitantId = ? AND tankId = ?',
         [amount, inhabitantId, aquariumId]
       );
     } else {
       // Neue Beziehung erstellen
       await pool.query(
-        'INSERT INTO inhabitants_aquariums (iid, aid, amount) VALUES (?, ?, ?)',
+        'INSERT INTO tank_inhabitant (inhabitantId, tankId, amount) VALUES (?, ?, ?)',
         [inhabitantId, aquariumId, amount]
       );
     }
@@ -227,7 +227,7 @@ router.get("/waterquality/:id", async(req, res) => {
     const { id } = req.params;
     console.log(`Route GET aquariums/waterquality/:id wurde aufgerufen mit ID: ${id}`);
     const [water_quality] = await pool.query(
-      "SELECT * FROM water_quality WHERE wid = ?",
+      "SELECT * FROM water_quality WHERE id = ?",
       [id]
     );
     if (water_quality.length === 0) {
