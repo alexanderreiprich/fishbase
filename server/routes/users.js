@@ -176,8 +176,8 @@ router.get("/profile/:id", async (req, res) => {
       ? Buffer.from(users[0].picture).toString("base64")
       : null;
 
-    const aquariumBase64 = users[0].aquarium
-      ? Buffer.from(users[0].aquarium).toString("base64")
+    const aquariumBase64 = users[0].tank
+      ? users[0].tank.toString("base64")
       : null;
 
     const user = {
@@ -315,10 +315,10 @@ router.get("/me", async (req, res) => {
       ? Buffer.from(users[0].picture).toString("base64")
       : null;
 
-    const aquariumBase64 = users[0].aquarium
-      ? Buffer.from(users[0].aquarium).toString("base64")
+    const aquariumBase64 = users[0].tank
+      ? users[0].tank.toString("base64")
       : null;
-
+      
     const user = {
       ...users[0],
       picture: imageBase64,
