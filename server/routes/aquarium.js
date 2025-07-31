@@ -13,7 +13,7 @@ router.post("/user/create/:id", async (req, res) => {
 
     const [result] = await pool.query(
       "INSERT INTO tank (userid, waterqualityid, capacity, name) VALUES (?, ?, ?, ?)",
-      [id, 0, capacity, name]
+      [id, null, capacity, name]
     );
 
     res.status(201).json({
