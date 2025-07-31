@@ -67,10 +67,9 @@ export default function AddInhabitantsDialog({
             break;
         }
       }
-
+      await checkPredatorConflicts(animals);
       setAnimals(animals);
       setPlants(plants);
-      await checkPredatorConflicts(animals);
     } catch (error) {
       console.error("Fehler bei der Suche:", error);
     } finally {

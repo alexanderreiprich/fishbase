@@ -50,8 +50,8 @@ async function searchWithExactMatch(
   let params = [];
 
   if (names && names.length > 0 && names[0] != null) {
-    whereClauses.push(`A.name IN (${names.map(() => "?").join(",")})`);
-    params.push(...names);
+    whereClauses.push(`(A.name IN (${names.map(() => "?").join(",")}) OR A.latinname IN (${names.map(() => "?").join(",")}))`);
+    params.push(...names, ...names);
   }
   if (
     temperature &&
@@ -88,6 +88,8 @@ async function searchWithExactMatch(
   let query = `SELECT * FROM inhabitant A, water_quality B WHERE ${whereClauses.join(
     " AND "
   )}`;
+  console.log(query);
+  console.log(params);
   const [inhabitants] = await pool.query(query, params);
   return inhabitants;
 }

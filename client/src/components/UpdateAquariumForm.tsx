@@ -37,6 +37,7 @@ export default function UpdateAquariumForm() {
     try {
       const aquariums = await repository.getAquariumsOfUser(user!.id);
       setAllAquariums(aquariums);
+      console.log(aquariums);
     } catch (error) {
       console.error("Fehler beim Abrufen der Aquarien:", error);
     } finally {
@@ -59,6 +60,28 @@ export default function UpdateAquariumForm() {
       setFormError("Bitte wähle ein Aquarium aus.");
     }
   };
+
+  const handleDeleteClick = async (event: React.FormEvent) => {
+    event.preventDefault();
+    if (chosenAquarium) {
+      try {
+        setLoading(true);
+        setFormError(null);
+        await repository.deleteAquarium(chosenAquarium);
+        
+        await fetchAquariums();
+        setChosenAquarium(null);
+        
+      } catch (error) {
+        console.error("Fehler beim Löschen des Aquariums:", error);
+        setFormError("Fehler beim Löschen des Aquariums");
+      } finally {
+        setLoading(false);
+      }
+    } else {
+      setFormError("Bitte wähle ein Aquarium aus.");
+    }
+  }
 
   return (
     <Box
@@ -112,6 +135,21 @@ export default function UpdateAquariumForm() {
           }}
         >
           {loading ? <CircularProgress size={24} /> : "Aquarium auswählen"}
+        </Button>
+        <Button
+          onClick={handleDeleteClick}
+          variant="contained"
+          color="error"
+          disabled={loading || !chosenAquarium}
+          sx={{
+            mt: 2,
+            "&.Mui-disabled": {
+              color: "white",
+              opacity: 0.5,
+            },
+          }}
+        >
+          {loading ? <CircularProgress size={24} /> : "Aquarium löschen"}
         </Button>
       </FormControl>
     </Box>

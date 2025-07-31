@@ -161,7 +161,7 @@ export class UserRepository {
       id: apiData.id,
       username: apiData.username,
       favoritefish: apiData.favoritefish,
-      aquarium: apiData.aquarium ? this.toBlob(apiData.aquarium) : null,
+      tank: apiData.aquarium ? this.toBlob(apiData.aquarium) : null,
       picture: apiData.picture ? this.toBlob(apiData.picture) : null,
       email: "",
       bio: "",

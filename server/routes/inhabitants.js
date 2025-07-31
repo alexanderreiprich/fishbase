@@ -1,6 +1,7 @@
 const express = require("express");
 const router = express.Router();
 const inhabitantService = require("../services/inhabitantService");
+const pool = require("../config/db");
 
 // Alle Inhabitants abfragen
 router.get("/all", async (req, res) => {
@@ -66,7 +67,7 @@ router.get("/predators/:id", async (req, res) => {
     const { id } = req.params;
     console.log(`Route predators/:id wurde aufgerufen mit ID: ${id}`);
     const [predators] = await pool.query(
-      "SELECT i.* FROM predators p JOIN inhabitants i ON p.predator = i.id WHERE p.victim = ?",
+      "SELECT i.* FROM predator p JOIN inhabitant i ON p.predatorId = i.id WHERE p.victimId = ?",
       [id]
     );
 
@@ -83,7 +84,7 @@ router.get("/victims/:id", async (req, res) => {
     const { id } = req.params;
     console.log(`Route victims/:id wurde aufgerufen mit ID: ${id}`);
     const [victims] = await pool.query(
-      "SELECT i.* FROM predators p JOIN inhabitants i ON p.victim = i.id WHERE p.predator = ?",
+      "SELECT i.* FROM predator p JOIN inhabitant i ON p.victimId = i.id WHERE p.predatorId = ?",
       [id]
     );
 
@@ -99,7 +100,6 @@ router.post("/search", async (req, res) => {
   try {
     console.log("Route /search wurde aufgerufen");
     const searchParams = req.body;
-    console.log(searchParams);
     const result = await inhabitantService.searchInhabitants(searchParams);
 
     if (result.length == 0) {

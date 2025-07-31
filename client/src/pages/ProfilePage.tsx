@@ -132,31 +132,21 @@ const ProfilePage: React.FC = () => {
               </Typography>
             </Box>
           </Box>
-          <Box className="profile-subheader-container">
-            <Typography
-              variant="h3"
-              component="h3"
-              className="profile-subheader-text"
-            >
-              Aquariums
-            </Typography>
-          </Box>
-
-          {user?.aquarium && (
+          {user?.tank && (
             <Box className="aquarium-section">
               <Typography
                 variant="h4"
                 component="h4"
                 className="aquarium-title"
               >
-                Mein Aquarium
+                Mein Heim-Aquarium
               </Typography>
               <img
                 className="aquarium-image"
                 src={(() => {
-                  if (typeof user.aquarium === "string") {
+                  if (typeof user.tank === "string") {
                     // Base64-String zu Blob konvertieren
-                    const byteCharacters = atob(user.aquarium);
+                    const byteCharacters = atob(user.tank);
                     const byteNumbers = new Array(byteCharacters.length);
                     for (let i = 0; i < byteCharacters.length; i++) {
                       byteNumbers[i] = byteCharacters.charCodeAt(i);
@@ -165,24 +155,10 @@ const ProfilePage: React.FC = () => {
                     const blob = new Blob([byteArray], { type: "image/jpeg" });
                     return URL.createObjectURL(blob);
                   }
-                  return URL.createObjectURL(user.aquarium);
+                  return URL.createObjectURL(user.tank);
                 })()}
                 alt="Aquarium"
               />
-            </Box>
-          )}
-          {user?.favoritefish && (
-            <Box className="favorite-fish-section">
-              <Typography
-                variant="h4"
-                component="h4"
-                className="favorite-fish-title"
-              >
-                Mein Lieblingsfisch
-              </Typography>
-              <Typography variant="h5" component="h5" className="favorite-fish">
-                {favFish?.name}
-              </Typography>
             </Box>
           )}
         </Box>
@@ -266,6 +242,20 @@ const ProfilePage: React.FC = () => {
             </Box>
           </>
         )}
+        {user?.favoritefish && (
+            <Box className="favorite-fish-section" sx={{mt: 4}}>
+              <Typography
+                variant="h4"
+                component="h4"
+                className="favorite-fish-title"
+              >
+                Mein Lieblingsfisch
+              </Typography>
+              <Typography variant="h5" component="h5" className="favorite-fish">
+                {favFish?.name}
+              </Typography>
+            </Box>
+          )}
       </Paper>
     </Box>
   );

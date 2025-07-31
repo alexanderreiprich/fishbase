@@ -10,18 +10,16 @@ import { InhabitantRepository } from "../repositories/InhabitantRepository";
 import { Inhabitant } from "../interfaces/Inhabitant";
 import { AquariumRepository } from "../repositories/AquariumRepository";
 import { Aquarium } from "../interfaces/Aquarium";
+import { User } from "../interfaces/User";
+import { UserRepository } from "../repositories/UserRepository";
 
 const PersonalProfilePage: React.FC = () => {
-  const { user, isAuthenticated, refreshUserData } = useAuth();
+  const { isAuthenticated, refreshUserData } = useAuth();
+  const user_id = useAuth().user?.id || 0;
+  const [user, setUser] = useState<User | null>(null);
   const [refreshKey, setRefreshKey] = useState(0);
   const [favFish, setFavFish] = useState<Inhabitant | null>(null);
   const [aquariums, setAquariums] = useState<Aquarium[] | null>(null);
-
-  const inhabitantRepository: InhabitantRepository =
-    InhabitantRepository.getInstance();
-
-  const aquariumRepository: AquariumRepository =
-    AquariumRepository.getInstance();
 
   const handlePictureUpdated = async () => {
     await refreshUserData();
@@ -34,32 +32,27 @@ const PersonalProfilePage: React.FC = () => {
   };
 
   useEffect(() => {
-    if (user?.favoritefish) {
-      fetchFavoriteFish();
-    }
-    if (user) {
-      fetchAquariums();
-    }
-
-    // otherwise update on every re-render
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [user?.favoritefish]);
-
-  const fetchFavoriteFish = async () => {
-    const id: number = user?.favoritefish!;
-    const inhabitant: Inhabitant = await inhabitantRepository.getInhabitantById(
-      id
-    );
-    setFavFish(inhabitant);
-  };
-
-  const fetchAquariums = async () => {
-    const id: number = user!.id;
-    const aquariums: Aquarium[] = await aquariumRepository.getAquariumsOfUser(
-      id
-    );
-    setAquariums(aquariums);
-  };
+    const fetchUser = async () => {
+      try {
+        const repository = UserRepository.getInstance();
+        const tankRepository: AquariumRepository =
+          AquariumRepository.getInstance();
+        const inhabitantRepository: InhabitantRepository =
+          InhabitantRepository.getInstance();
+        const userData = await repository.getUserById(user_id);
+        const aquariumData = await tankRepository.getAquariumsOfUser(user_id);
+        setUser(userData);
+        setAquariums(aquariumData);
+        if(userData.favoritefish) {
+          const favFish = await inhabitantRepository.getInhabitantById(userData.favoritefish);
+          setFavFish(favFish);
+        }
+      } catch (error) {
+        console.error("Fehler beim Laden der Benutzerdaten:", error);
+      }
+    };
+    fetchUser();
+  }, [user_id]);
 
   // Redirect to login page if user is not authenticated
   if (!isAuthenticated) {
@@ -111,21 +104,7 @@ const PersonalProfilePage: React.FC = () => {
               <LogoutButton />
             </Box>
           </Box>
-          {user?.favoritefish && (
-            <Box className="favorite-fish-section">
-              <Typography
-                variant="h4"
-                component="h4"
-                className="favorite-fish-title"
-              >
-                Mein Lieblingsfisch
-              </Typography>
-              <Typography variant="h5" component="h5" className="favorite-fish">
-                {favFish?.name}
-              </Typography>
-            </Box>
-          )}
-          {user?.aquarium && (
+          {user?.tank && (
             <Box className="aquarium-section">
               <Typography
                 variant="h4"
@@ -137,9 +116,9 @@ const PersonalProfilePage: React.FC = () => {
               <img
                 className="aquarium-image"
                 src={(() => {
-                  if (typeof user.aquarium === "string") {
+                  if (typeof user.tank === "string") {
                     // Base64-String zu Blob konvertieren
-                    const byteCharacters = atob(user.aquarium);
+                    const byteCharacters = atob(user.tank);
                     const byteNumbers = new Array(byteCharacters.length);
                     for (let i = 0; i < byteCharacters.length; i++) {
                       byteNumbers[i] = byteCharacters.charCodeAt(i);
@@ -148,7 +127,7 @@ const PersonalProfilePage: React.FC = () => {
                     const blob = new Blob([byteArray], { type: "image/jpeg" });
                     return URL.createObjectURL(blob);
                   }
-                  return URL.createObjectURL(user.aquarium);
+                  return URL.createObjectURL(user.tank);
                 })()}
                 alt="Aquarium"
               />
@@ -233,6 +212,20 @@ const PersonalProfilePage: React.FC = () => {
                 )}
               </Box>
             </>
+          )}
+          {user?.favoritefish && (
+            <Box className="favorite-fish-section">
+              <Typography
+                variant="h4"
+                component="h4"
+                className="favorite-fish-title"
+              >
+                Mein Lieblingsfisch
+              </Typography>
+              <Typography variant="h5" component="h5" className="favorite-fish">
+                {favFish?.name}
+              </Typography>
+            </Box>
           )}
         </Box>
       </Paper>

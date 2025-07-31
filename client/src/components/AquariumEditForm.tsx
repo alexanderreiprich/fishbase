@@ -24,6 +24,7 @@ import { InhabitantRepository } from "../repositories/InhabitantRepository";
 import EditIcon from "@mui/icons-material/Edit";
 import DeleteIcon from "@mui/icons-material/Delete";
 import AddInhabitantsDialog from "./AddInhabitantsDialog";
+import { AquariumQuantity } from "../interfaces/AquariumQuantity";
 
 export default function AquariumEditForm() {
   const location = useLocation();
@@ -42,11 +43,7 @@ export default function AquariumEditForm() {
   const [inhabitants, setInhabitants] = useState<Inhabitant[]>(
     aquarium?.inhabitants || []
   );
-  const [inhabitantQuantities, setInhabitantQuantities] = useState<Map<number, number>>(
-    new Map(
-      aquarium?.inhabitants?.map((inhabitant) => [inhabitant.id, 1]) || []
-    )
-  );
+  const [inhabitantQuantities, setInhabitantQuantities] = useState<AquariumQuantity[] | []>([]);
 
   // Dialog state
   const [dialogOpen, setDialogOpen] = useState(false);
@@ -57,27 +54,25 @@ export default function AquariumEditForm() {
   const [addInhabitantsDialogOpen, setAddInhabitantsDialogOpen] =
     useState(false);
 
+
   const handleRemove = (id: number) => {
     setInhabitants((prev) => prev.filter((i) => i.id !== id));
-    setInhabitantQuantities((prev) => {
-      const newMap = new Map(prev);
-      newMap.delete(id);
-      return newMap;
-    });
+    setInhabitantQuantities((prev) => prev.filter((item, index) => index !== id));
   };
 
   const handleEditQuantity = (inhabitantId: number) => {
     setSelectedInhabitantId(inhabitantId);
-    setNewQuantity(inhabitantQuantities.get(inhabitantId) || 1);
+    setNewQuantity(inhabitantQuantities.find((i) => i.inhabitantId === inhabitantId)?.amount || 1);
     setDialogOpen(true);
   };
 
   const handleSaveQuantity = () => {
     if (selectedInhabitantId) {
       setInhabitantQuantities((prev) => {
-        const newMap = new Map(prev);
-        newMap.set(selectedInhabitantId, newQuantity);
-        return newMap;
+        const newArray = [...prev];
+        const entry = newArray.find((i) => i.inhabitantId === selectedInhabitantId);
+        entry!.amount = newQuantity;
+        return newArray;
       });
     }
     setDialogOpen(false);
@@ -103,19 +98,20 @@ export default function AquariumEditForm() {
       const existingInhabitant = inhabitants.find((i) => i.id === inhabitantId);
       if (existingInhabitant) {
         // Wenn bereits vorhanden, nur die Quantity aktualisieren
-        setInhabitantQuantities((prev) => {
-          const newMap = new Map(prev);
-          const currentQuantity = newMap.get(inhabitantId) || 0;
-          newMap.set(inhabitantId, currentQuantity + quantity);
-          return newMap;
-        });
+        setInhabitantQuantities(prev => 
+          prev.map(item => 
+            item.inhabitantId === inhabitantId 
+              ? { ...item, amount: (item.amount || 0) + quantity }
+              : item
+          )
+        );
       } else {
         // Neuen Inhabitant hinzufügen
         setInhabitants((prev) => [...prev, inhabitant]);
         setInhabitantQuantities((prev) => {
-          const newMap = new Map(prev);
-          newMap.set(inhabitantId, quantity);
-          return newMap;
+          const newArray = [...prev];
+          newArray.push({amount: quantity, inhabitantId: inhabitantId, tankId: aquarium!.id});
+          return newArray;
         });
       }
     } catch (error) {
@@ -137,7 +133,15 @@ export default function AquariumEditForm() {
       setName(aquarium.name);
       setCapacity(aquarium.capacity);
       setWaterQualityId(aquarium.waterQualityId);
+      
+      const loadInhabitants = async () => {
+        const inhabitants = await repository.getAmountOfInhabitants(aquarium.id);
+        setInhabitantQuantities(inhabitants);
+      };
+      
+      loadInhabitants();
     }
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [aquarium]);
 
   useEffect(() => {
@@ -160,7 +164,7 @@ export default function AquariumEditForm() {
         },
         inhabitants.map((inhabitant) => ({
           ...inhabitant,
-          quantity: inhabitantQuantities.get(inhabitant.id) || 1,
+          quantity: inhabitantQuantities.find((i) => i.inhabitantId === inhabitant.id)?.amount || 1,
         }))
       );
       navigate(-1);
@@ -226,7 +230,7 @@ export default function AquariumEditForm() {
           <ListItem key={inhabitant.id}>
             <ListItemText
               primary={`${inhabitant.name} (${
-                inhabitantQuantities.get(inhabitant.id) || 1
+                inhabitantQuantities.find((i) => i.inhabitantId === inhabitant.id)?.amount || 1
               }x)`}
             />
             <ListItemSecondaryAction>
@@ -304,7 +308,7 @@ export default function AquariumEditForm() {
         existingInhabitants={inhabitants.map((inhabitant) => ({
           id: inhabitant.id,
           name: inhabitant.name,
-          quantity: inhabitantQuantities.get(inhabitant.id) || 1,
+          quantity: inhabitantQuantities.find((i) => i.inhabitantId === inhabitant.id)?.amount || 1,
         }))}
       />
     </Box>

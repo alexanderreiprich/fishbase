@@ -4,5 +4,5 @@ export interface User {
   email: string;
   picture: Blob | null;
   favoritefish: number | null;
-  aquarium: Blob | null;
+  tank: Blob | null;
 }
