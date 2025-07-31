@@ -117,6 +117,29 @@ router.post("/user/update", async (req, res) => {
   }
 });
 
+router.delete("/user/delete", async (req, res) => {
+  try {
+    const tank = req.body;
+    console.log(`Route DELETE aquariums/user/delete wurde aufgerufen`);
+    await pool.query(
+      "DELETE FROM tank_inhabitant WHERE tankId = ?",
+      [tank.id]
+    );
+
+    await pool.query(
+      "DELETE FROM tank WHERE id = ?",
+      [tank.id]
+    );
+
+    res.status(200).json({ message: "Aquarium erfolgreich gelöscht" });
+  } catch (error) {
+    console.error("Fehler:", error);
+    res
+      .status(500)
+      .json({ message: "Serverfehler beim Löschen des Aquariums" });
+  }
+});
+
 // Abfragen der Aquarien eines Nutzers
 router.get("/user/:id", async (req, res) => {
   try {
