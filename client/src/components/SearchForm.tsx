@@ -21,18 +21,11 @@ import { InhabitantType } from "../interfaces/InhabitantType";
 import "../style/SearchForm.css";
 import { SearchOptions } from "../interfaces/SearchOptions";
 
-
 interface SearchFormProps {
   onSearch: (searchParams: SearchOptions) => void;
   lastSearchParams?: SearchOptions;
 }
 
-const salinityMarks = [
-  {
-    value: 0,
-    label: "0",
-  },
-];
 const temperatureMarks = [
   {
     value: 15,
@@ -85,7 +78,7 @@ const initialColors = {
   weiß: false,
   braun: false,
   bunt: false,
-}
+};
 
 export const SearchForm: React.FC<SearchFormProps> = ({
   onSearch,
@@ -98,7 +91,7 @@ export const SearchForm: React.FC<SearchFormProps> = ({
   const [salinity, setSalinity] = useState<number>(0);
   const [phValue, setPhValue] = useState<number[]>([5, 9]);
   const [temperature, setTemperature] = useState<number[]>([15, 30]);
-  const [selectedColors, setSelectedColors] = React.useState<string[]>([])
+  const [selectedColors, setSelectedColors] = React.useState<string[]>([]);
 
   // Checkbox States für das Ignorieren von Feldern
   const [ignorePh, setIgnorePh] = useState(false);
@@ -119,11 +112,11 @@ export const SearchForm: React.FC<SearchFormProps> = ({
             : InhabitantType.PLANT
           : ""
       );
-      setHabitat(lastSearchParams.habitat || "")
-      setSalinity(lastSearchParams.salinity || 0)
-      setPhValue(lastSearchParams.phValue || [0, 5])
-      setTemperature(lastSearchParams.temperature || [0, 5])
-      setSelectedColors(lastSearchParams.colors || [])
+      setHabitat(lastSearchParams.habitat || "");
+      setSalinity(lastSearchParams.salinity || 0);
+      setPhValue(lastSearchParams.phValue || [0, 5]);
+      setTemperature(lastSearchParams.temperature || [0, 5]);
+      setSelectedColors(lastSearchParams.colors || []);
 
       // Erweiterte Suche anzeigen, wenn erweiterte Parameter verwendet wurden
       if (
@@ -140,8 +133,8 @@ export const SearchForm: React.FC<SearchFormProps> = ({
   }, [lastSearchParams]);
 
   const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault()
-    e.stopPropagation()
+    e.preventDefault();
+    e.stopPropagation();
     onSearch({
       searchText: search === "" ? null : search,
       type: type === "" ? null : typeStrings[type as number],
@@ -160,11 +153,9 @@ export const SearchForm: React.FC<SearchFormProps> = ({
   const handleColorChange = (event: any) => {
     const {
       target: { value },
-    } = event
-    setSelectedColors(
-      typeof value === 'string' ? value.split(',') : value,
-    )
-  }
+    } = event;
+    setSelectedColors(typeof value === "string" ? value.split(",") : value);
+  };
 
   return (
     <Paper elevation={3} className="searchform-paper">
@@ -243,16 +234,24 @@ export const SearchForm: React.FC<SearchFormProps> = ({
                     onChange={handleColorChange}
                     input={<OutlinedInput label="Farben" />}
                     renderValue={(selected) => (
-                      <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 0.5 }}>
+                      <Box sx={{ display: "flex", flexWrap: "wrap", gap: 0.5 }}>
                         {selected.map((value) => (
-                          <Chip key={value} label={value.substring(0, 1).toUpperCase() + value.substring(1)} sx={{ backgroundColor: 'var(--primary-main)'}} />
+                          <Chip
+                            key={value}
+                            label={
+                              value.substring(0, 1).toUpperCase() +
+                              value.substring(1)
+                            }
+                            sx={{ backgroundColor: "var(--primary-main)" }}
+                          />
                         ))}
                       </Box>
                     )}
                   >
                     {Object.keys(initialColors).map((color) => (
                       <MenuItem key={color} value={color}>
-                        {color.substring(0, 1).toUpperCase() + color.substring(1)}
+                        {color.substring(0, 1).toUpperCase() +
+                          color.substring(1)}
                       </MenuItem>
                     ))}
                   </Select>
