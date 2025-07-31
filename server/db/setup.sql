@@ -145,14 +145,8 @@ INSERT INTO inhabitant (name, latinname, habitat, color, type, length, food) VAL
 ('Marmorierter Beilbauchfisch', 'Carnegiella strigata', 'Südamerika', 'Silber', 'fish', 4.0, 'Flocken, Lebendfutter'),
 ('Roter Beilbauchfisch', 'Carnegiella marthae', 'Südamerika', 'Rot', 'fish', 4.0, 'Flocken, Lebendfutter'),
 ('Zwergkugelfisch', 'Carinotetraodon travancoricus', 'Asien', 'Gelb', 'fish', 3.0, 'Lebendfutter, Schnecken'),
-('Zwergbuntbarsch', 'Apistogramma borellii', 'Südamerika', 'Blau', 'fish', 7.0, 'Flocken, Lebendfutter'),
-('Roter Zwergbuntbarsch', 'Apistogramma agassizii', 'Südamerika', 'Rot', 'fish', 8.0, 'Flocken, Lebendfutter'),
-('Blauer Zwergbuntbarsch', 'Apistogramma trifasciata', 'Südamerika', 'Blau', 'fish', 7.0, 'Flocken, Lebendfutter'),
-('Gelber Zwergbuntbarsch', 'Apistogramma nijsseni', 'Südamerika', 'Gelb', 'fish', 7.0, 'Flocken, Lebendfutter'),
-('Roter Zwergbuntbarsch', 'Apistogramma cacatuoides', 'Südamerika', 'Rot', 'fish', 8.0, 'Flocken, Lebendfutter'),
-('Blauer Zwergbuntbarsch', 'Apistogramma macmasteri', 'Südamerika', 'Blau', 'fish', 7.0, 'Flocken, Lebendfutter'),
-('Gelber Zwergbuntbarsch', 'Apistogramma viejita', 'Südamerika', 'Gelb', 'fish', 7.0, 'Flocken, Lebendfutter'),
-('Roter Zwergbuntbarsch', 'Apistogramma hongsloi', 'Südamerika', 'Rot', 'fish', 8.0, 'Flocken, Lebendfutter');
+('Zwergbuntbarsch', 'Apistogramma borellii', 'Südamerika', 'Blau', 'fish', 7.0, 'Flocken, Lebendfutter');
+
 
 -- Einfügen von 15 beliebten wirbellosen Aquarientieren
 INSERT INTO inhabitant (name, latinname, habitat, color, type, length, food) VALUES
@@ -474,7 +468,9 @@ INSERT INTO water_quality (inhabitantId, salinity, minTemperature, maxTemperatur
 ((SELECT id FROM inhabitant WHERE name='Pogostemon helferi'),0,22,28,6.0,7.5),
 ((SELECT id FROM inhabitant WHERE name='Pogostemon erectus'),0,22,28,6.0,7.5),
 ((SELECT id FROM inhabitant WHERE name='Alternanthera reineckii'),0,22,28,6.0,7.5),
+((SELECT id FROM inhabitant WHERE name='Alternanthera reineckii mini'),0,22,28,6.0,7.5),
 ((SELECT id FROM inhabitant WHERE name='Bucephalandra sp.'),0,22,28,6.0,7.0),
+((SELECT id FROM inhabitant WHERE name='Bucephalandra sp. Red.'),0,22,28,6.0,7.0),
 ((SELECT id FROM inhabitant WHERE name='Cryptocoryne parva'),0,22,28,6.0,7.5),
 ((SELECT id FROM inhabitant WHERE name='Cryptocoryne undulata'),0,22,28,6.0,7.5),
 ((SELECT id FROM inhabitant WHERE name='Cryptocoryne crispatula'),0,22,28,6.0,7.5),
