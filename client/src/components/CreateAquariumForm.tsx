@@ -17,7 +17,7 @@ export default function CreateAquariumForm() {
     e.preventDefault();
 		setLoading(true);
     try {
-			repository.createAquarium(user!.id, capacity!, aquariumName);
+			await repository.createAquarium(user!.id, capacity!, aquariumName);
 			navigate("/add");
     } catch (error) {
       setFormError("Etwas ist schiefgelaufen, bitte versuche es erneut.")

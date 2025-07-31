@@ -135,6 +135,29 @@ export class AquariumRepository {
     }
   }
 
+  public async getAmountOfInhabitants(aquariumId: number) {
+    try {
+      const response = await fetch(`${this.baseUrl}/amount/${aquariumId}`, {
+        method: "GET",
+        headers: {
+          "Content-Type": "application/json",
+          ...this.getFetchOptions().headers,
+        }
+      });
+      if (!response.ok) {
+        throw new Error("Fehler beim Hinzufügen des Inhabitants");
+      }
+      const data = await response.json();
+      return data;
+    } catch (error) {
+      console.error(
+        "Fehler beim Abfragen der Inhabitant-Anzahl",
+        error
+      );
+      throw error;
+    }
+  }
+
   public async addInhabitantToAquarium(
     aquariumId: number,
     inhabitantId: number,
@@ -147,7 +170,7 @@ export class AquariumRepository {
           "Content-Type": "application/json",
           ...this.getFetchOptions().headers,
         },
-        body: JSON.stringify({ aquariumId, inhabitantId, amount }),
+        body: JSON.stringify({ aquariumId: aquariumId, inhabitantId: inhabitantId, amount: amount }),
       });
       if (!response.ok) {
         throw new Error("Fehler beim Hinzufügen des Inhabitants");

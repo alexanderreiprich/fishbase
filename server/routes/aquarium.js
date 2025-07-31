@@ -117,6 +117,7 @@ router.post("/user/update", async (req, res) => {
   }
 });
 
+// Löschen eines Aquariums
 router.delete("/user/delete", async (req, res) => {
   try {
     const tank = req.body;
@@ -255,6 +256,31 @@ router.post("/add", async (req, res) => {
   }
 });
 
+// Anzahl alle Inhabitants eines Aquariums abfragen
+router.get("/amount/:id", async (req, res) => {
+  try {
+    const { id } = req.params;
+    console.log(
+      `Route GET aquariums/amount/:id wurde aufgerufen mit ID: ${id}`
+    );
+    const [amount] = await pool.query(
+      "SELECT * FROM tank_inhabitant WHERE tankId = ?",
+      [id]
+    );
+    if (amount.length === 0) {
+      return res.status(404).json({ message: "Keine Inhabitants gefunden" });
+    }
+
+    res.status(200).json(amount);
+  } catch (error) {
+    console.error("Fehler:", error);
+    res
+      .status(500)
+      .json({ message: "Serverfehler bei der Abfrage der Anzahl der Inhabitants" });
+  }
+});
+
+// Wasserqualität eines Aquariums abfragen
 router.get("/waterquality/:id", async (req, res) => {
   try {
     const { id } = req.params;

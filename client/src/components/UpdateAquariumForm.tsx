@@ -37,6 +37,7 @@ export default function UpdateAquariumForm() {
     try {
       const aquariums = await repository.getAquariumsOfUser(user!.id);
       setAllAquariums(aquariums);
+      console.log(aquariums);
     } catch (error) {
       console.error("Fehler beim Abrufen der Aquarien:", error);
     } finally {

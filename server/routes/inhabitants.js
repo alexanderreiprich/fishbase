@@ -100,7 +100,6 @@ router.post("/search", async (req, res) => {
   try {
     console.log("Route /search wurde aufgerufen");
     const searchParams = req.body;
-    console.log(searchParams);
     const result = await inhabitantService.searchInhabitants(searchParams);
 
     if (result.length == 0) {
