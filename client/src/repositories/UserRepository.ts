@@ -1,25 +1,25 @@
-import { SearchOptions } from "../interfaces/SearchOptions"
-import { User } from "../interfaces/User"
+import { SearchOptions } from "../interfaces/SearchOptions";
+import { User } from "../interfaces/User";
 
 interface ApiUser {
-  id: number
-  picture: { type: "Buffer"; data: number[] } | string | null
-  username: string
-  aquarium: { type: "Buffer"; data: number[] } | string | null
-  favoritefish: number
+  id: number;
+  picture: { type: "Buffer"; data: number[] } | string | null;
+  username: string;
+  aquarium: { type: "Buffer"; data: number[] } | string | null;
+  favoritefish: number;
 }
 
 export class UserRepository {
-  private static instance: UserRepository
-  private readonly baseUrl: string = "http://localhost:3002/api/users"
+  private static instance: UserRepository;
+  private readonly baseUrl: string = "http://localhost:3002/api/users";
 
   private constructor() {}
 
   public static getInstance(): UserRepository {
     if (!UserRepository.instance) {
-      UserRepository.instance = new UserRepository()
+      UserRepository.instance = new UserRepository();
     }
-    return UserRepository.instance
+    return UserRepository.instance;
   }
 
   private getFetchOptions(): RequestInit {
@@ -29,7 +29,7 @@ export class UserRepository {
         Pragma: "no-cache",
         Expires: "0",
       },
-    }
+    };
   }
 
   public async getUserById(id: number): Promise<User> {
@@ -37,15 +37,15 @@ export class UserRepository {
       const response = await fetch(
         `${this.baseUrl}/profile/${id}`,
         this.getFetchOptions()
-      )
+      );
       if (!response.ok) {
-        throw new Error("Fehler beim Abrufen der Daten")
+        throw new Error("Fehler beim Abrufen der Daten");
       }
-      const data: ApiUser = await response.json()
-      return this.transformToUser(data)
+      const data: ApiUser = await response.json();
+      return this.transformToUser(data);
     } catch (error) {
-      console.error("Fehler beim Abrufen der User:", error)
-      throw error
+      console.error("Fehler beim Abrufen der User:", error);
+      throw error;
     }
   }
 
@@ -57,21 +57,21 @@ export class UserRepository {
           "Content-Type": "application/json",
         },
         body: JSON.stringify(searchOptions),
-      })
+      });
       if (response.status === 404) {
-        return []
+        return [];
       } else if (!response.ok) {
-        throw new Error("Fehler beim Abrufen der Daten")
+        throw new Error("Fehler beim Abrufen der Daten");
       }
-      const data: ApiUser[] = await response.json()
+      const data: ApiUser[] = await response.json();
 
       const transformedUsers = await Promise.all(
         data.map((apiData) => this.transformToUser(apiData))
-      )
-      return transformedUsers
+      );
+      return transformedUsers;
     } catch (error) {
-      console.error("Fehler beim Abrufen der User:", error)
-      throw error
+      console.error("Fehler beim Abrufen der User:", error);
+      throw error;
     }
   }
 
@@ -80,27 +80,27 @@ export class UserRepository {
       const response = await fetch(
         `${this.baseUrl}/all`,
         this.getFetchOptions()
-      )
+      );
       if (!response.ok) {
-        throw new Error("Fehler beim Abrufen der Daten")
+        throw new Error("Fehler beim Abrufen der Daten");
       }
-      const data: ApiUser[] = await response.json()
+      const data: ApiUser[] = await response.json();
       const transformedUsers = await Promise.all(
         data.map((apiData) => this.transformToUser(apiData))
-      )
-      return transformedUsers
+      );
+      return transformedUsers;
     } catch (error) {
-      console.error("Fehler beim Abrufen der User:", error)
-      throw error
+      console.error("Fehler beim Abrufen der User:", error);
+      throw error;
     }
   }
 
   public async updateProfilePicture(picture: File): Promise<void> {
     try {
       // Bild zu Base64 konvertieren
-      const base64 = await this.fileToBase64(picture)
+      const base64 = await this.fileToBase64(picture);
 
-      const token = localStorage.getItem("token")
+      const token = localStorage.getItem("token");
       const response = await fetch(`${this.baseUrl}/profile/picture`, {
         method: "PUT",
         headers: {
@@ -108,14 +108,14 @@ export class UserRepository {
           Authorization: `Bearer ${token}`,
         },
         body: JSON.stringify({ picture: base64 }),
-      })
+      });
 
       if (!response.ok) {
-        throw new Error("Fehler beim Aktualisieren des Profilbilds")
+        throw new Error("Fehler beim Aktualisieren des Profilbilds");
       }
     } catch (error) {
-      console.error("Fehler beim Aktualisieren des Profilbilds:", error)
-      throw error
+      console.error("Fehler beim Aktualisieren des Profilbilds:", error);
+      throw error;
     }
   }
 
@@ -123,7 +123,7 @@ export class UserRepository {
     favoriteFishId: number | null
   ): Promise<void> {
     try {
-      const token = localStorage.getItem("token")
+      const token = localStorage.getItem("token");
       const response = await fetch(`${this.baseUrl}/profile/favoritefish`, {
         method: "PUT",
         headers: {
@@ -131,29 +131,29 @@ export class UserRepository {
           Authorization: `Bearer ${token}`,
         },
         body: JSON.stringify({ favoritefish: favoriteFishId }),
-      })
+      });
 
       if (!response.ok) {
-        throw new Error("Fehler beim Aktualisieren des Lieblingsfisches")
+        throw new Error("Fehler beim Aktualisieren des Lieblingsfisches");
       }
     } catch (error) {
-      console.error("Fehler beim Aktualisieren des Lieblingsfisches:", error)
-      throw error
+      console.error("Fehler beim Aktualisieren des Lieblingsfisches:", error);
+      throw error;
     }
   }
 
   private fileToBase64(file: File): Promise<string> {
     return new Promise((resolve, reject) => {
-      const reader = new FileReader()
-      reader.readAsDataURL(file)
+      const reader = new FileReader();
+      reader.readAsDataURL(file);
       reader.onload = () => {
-        const result = reader.result as string
+        const result = reader.result as string;
         // Entferne den "data:image/...;base64," Prefix
-        const base64 = result.split(",")[1]
-        resolve(base64)
-      }
-      reader.onerror = (error) => reject(error)
-    })
+        const base64 = result.split(",")[1];
+        resolve(base64);
+      };
+      reader.onerror = (error) => reject(error);
+    });
   }
 
   private async transformToUser(apiData: ApiUser): Promise<User> {
@@ -165,24 +165,24 @@ export class UserRepository {
       picture: apiData.picture ? this.toBlob(apiData.picture) : null,
       email: "",
       bio: "",
-    }
-    return cleanedUser
+    };
+    return cleanedUser;
   }
 
   private toBlob(data: { type: "Buffer"; data: number[] } | string): Blob {
     if (typeof data === "string") {
       // Base64-String zu Blob
-      const byteCharacters = atob(data)
-      const byteNumbers = new Array(byteCharacters.length)
+      const byteCharacters = atob(data);
+      const byteNumbers = new Array(byteCharacters.length);
       for (let i = 0; i < byteCharacters.length; i++) {
-        byteNumbers[i] = byteCharacters.charCodeAt(i)
+        byteNumbers[i] = byteCharacters.charCodeAt(i);
       }
-      const byteArray = new Uint8Array(byteNumbers)
-      return new Blob([byteArray], { type: "image/jpeg" })
+      const byteArray = new Uint8Array(byteNumbers);
+      return new Blob([byteArray], { type: "image/jpeg" });
     } else {
       // Buffer-Objekt zu Blob
-      const byteArray = new Uint8Array(data.data)
-      return new Blob([byteArray], { type: "image/jpeg" })
+      const byteArray = new Uint8Array(data.data);
+      return new Blob([byteArray], { type: "image/jpeg" });
     }
   }
 }

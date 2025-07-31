@@ -1,22 +1,22 @@
-const express = require('express');
+const express = require("express");
 const router = express.Router();
-const bcrypt = require('bcrypt');
-const jwt = require('jsonwebtoken');
-const pool = require('../config/db');
+const bcrypt = require("bcrypt");
+const jwt = require("jsonwebtoken");
+const pool = require("../config/db");
 
 // Registrierung eines neuen Benutzers
-router.post('/register', async (req, res) => {
+router.post("/register", async (req, res) => {
   try {
     const { username, email, password } = req.body;
 
     // Überprüfen, ob der Benutzer bereits existiert
     const [existingUsers] = await pool.query(
-      'SELECT * FROM user WHERE email = ? OR username = ?',
+      "SELECT * FROM user WHERE email = ? OR username = ?",
       [email, username]
     );
 
     if (existingUsers.length > 0) {
-      return res.status(400).json({ message: 'Benutzer existiert bereits' });
+      return res.status(400).json({ message: "Benutzer existiert bereits" });
     }
 
     // Passwort hashen
@@ -25,7 +25,7 @@ router.post('/register', async (req, res) => {
 
     // Benutzer in die Datenbank einfügen
     const [result] = await pool.query(
-      'INSERT INTO user (username, email, password) VALUES (?, ?, ?)',
+      "INSERT INTO user (username, email, password) VALUES (?, ?, ?)",
       [username, email, hashedPassword]
     );
 
@@ -33,11 +33,11 @@ router.post('/register', async (req, res) => {
     const token = jwt.sign(
       { userId: result.insertId },
       process.env.JWT_SECRET,
-      { expiresIn: '1h' }
+      { expiresIn: "1h" }
     );
 
     res.status(201).json({
-      message: 'Benutzer erfolgreich registriert',
+      message: "Benutzer erfolgreich registriert",
       token,
       user: {
         id: result.insertId,
@@ -46,23 +46,23 @@ router.post('/register', async (req, res) => {
       },
     });
   } catch (error) {
-    console.error('Registrierungsfehler:', error);
-    res.status(500).json({ message: 'Serverfehler bei der Registrierung' });
+    console.error("Registrierungsfehler:", error);
+    res.status(500).json({ message: "Serverfehler bei der Registrierung" });
   }
 });
 
 // Login eines Benutzers
-router.post('/login', async (req, res) => {
+router.post("/login", async (req, res) => {
   try {
     const { email, password } = req.body;
 
     // Benutzer in der Datenbank suchen
-    const [users] = await pool.query('SELECT * FROM user WHERE email = ?', [
+    const [users] = await pool.query("SELECT * FROM user WHERE email = ?", [
       email,
     ]);
 
     if (users.length === 0) {
-      return res.status(400).json({ message: 'Ungültige Anmeldedaten' });
+      return res.status(400).json({ message: "Ungültige Anmeldedaten" });
     }
 
     const user = users[0];
@@ -70,16 +70,16 @@ router.post('/login', async (req, res) => {
     // Passwort überprüfen
     const isMatch = await bcrypt.compare(password, user.password);
     if (!isMatch) {
-      return res.status(400).json({ message: 'Ungültige Anmeldedaten' });
+      return res.status(400).json({ message: "Ungültige Anmeldedaten" });
     }
 
     // JWT Token erstellen
     const token = jwt.sign({ userId: user.id }, process.env.JWT_SECRET, {
-      expiresIn: '1h',
+      expiresIn: "1h",
     });
 
     res.json({
-      message: 'Erfolgreich angemeldet',
+      message: "Erfolgreich angemeldet",
       token,
       user: {
         id: user.id,
@@ -88,32 +88,32 @@ router.post('/login', async (req, res) => {
       },
     });
   } catch (error) {
-    console.error('Login-Fehler:', error);
-    res.status(500).json({ message: 'Serverfehler beim Login' });
+    console.error("Login-Fehler:", error);
+    res.status(500).json({ message: "Serverfehler beim Login" });
   }
 });
 
-router.post('/search', async (req, res) => {
+router.post("/search", async (req, res) => {
   try {
-    console.log('Route /search wurde aufgerufen');
+    console.log("Route /search wurde aufgerufen");
     const { searchText } = req.body;
 
     const [users] = await pool.query(
-      'SELECT id, picture, username, favoritefish, tank FROM user WHERE username LIKE ?',
+      "SELECT id, picture, username, favoritefish, tank FROM user WHERE username LIKE ?",
       [`%${searchText}%`]
     );
     if (users.length == 0) {
-      return res.status(404).json({ message: 'Keine User gefunden' });
+      return res.status(404).json({ message: "Keine User gefunden" });
     }
 
     // Bilder in Base64 konvertieren
     const usersWithBase64 = users.map((user) => {
       const imageBase64 = user.picture
-        ? Buffer.from(user.picture).toString('base64')
+        ? Buffer.from(user.picture).toString("base64")
         : null;
 
       const aquariumBase64 = user.aquarium
-        ? Buffer.from(user.aquarium).toString('base64')
+        ? Buffer.from(user.aquarium).toString("base64")
         : null;
 
       return {
@@ -125,27 +125,27 @@ router.post('/search', async (req, res) => {
 
     res.status(200).json(usersWithBase64);
   } catch (error) {
-    console.error('API-Fehler:', error);
-    res.status(500).json({ message: 'Serverfehler bei der Abfrage der User' });
+    console.error("API-Fehler:", error);
+    res.status(500).json({ message: "Serverfehler bei der Abfrage der User" });
   }
 });
 
-router.get('/all', async (req, res) => {
+router.get("/all", async (req, res) => {
   try {
-    console.log('Route /all wurde aufgerufen');
+    console.log("Route /all wurde aufgerufen");
 
-    const [users] = await pool.query('SELECT id, picture, username FROM user', [
+    const [users] = await pool.query("SELECT id, picture, username FROM user", [
       searchText,
     ]);
 
     if (users.length == 0) {
-      return res.status(404).json({ message: 'Keine User gefunden' });
+      return res.status(404).json({ message: "Keine User gefunden" });
     }
 
     // Bilder in Base64 konvertieren
     const usersWithBase64 = users.map((user) => {
       const imageBase64 = user.picture
-        ? Buffer.from(user.picture).toString('base64')
+        ? Buffer.from(user.picture).toString("base64")
         : null;
 
       return {
@@ -156,28 +156,28 @@ router.get('/all', async (req, res) => {
 
     res.status(200).json(usersWithBase64);
   } catch (error) {
-    console.error('API-Fehler:', error);
-    res.status(500).json({ message: 'Serverfehler bei der Abfrage der User' });
+    console.error("API-Fehler:", error);
+    res.status(500).json({ message: "Serverfehler bei der Abfrage der User" });
   }
 });
 
-router.get('/profile/:id', async (req, res) => {
+router.get("/profile/:id", async (req, res) => {
   try {
     const { id } = req.params;
     console.log(`Route users/:id wurde aufgerufen mit ID: ${id}`);
-    const [users] = await pool.query('SELECT * FROM user WHERE id = ?', [id]);
+    const [users] = await pool.query("SELECT * FROM user WHERE id = ?", [id]);
 
     if (users.length === 0) {
-      return res.status(404).json({ message: 'User nicht gefunden' });
+      return res.status(404).json({ message: "User nicht gefunden" });
     }
 
     // Bild in Base64 konvertieren
     const imageBase64 = users[0].picture
-      ? Buffer.from(users[0].picture).toString('base64')
+      ? Buffer.from(users[0].picture).toString("base64")
       : null;
 
     const aquariumBase64 = users[0].aquarium
-      ? Buffer.from(users[0].aquarium).toString('base64')
+      ? Buffer.from(users[0].aquarium).toString("base64")
       : null;
 
     const user = {
@@ -188,135 +188,135 @@ router.get('/profile/:id', async (req, res) => {
 
     res.status(200).json(user);
   } catch (error) {
-    console.error('API-Fehler:', error);
-    res.status(500).json({ message: 'Serverfehler bei der Abfrage der User' });
+    console.error("API-Fehler:", error);
+    res.status(500).json({ message: "Serverfehler bei der Abfrage der User" });
   }
 });
 
 // Profilbild aktualisieren
-router.put('/profile/picture', async (req, res) => {
+router.put("/profile/picture", async (req, res) => {
   try {
-    const token = req.header('Authorization')?.replace('Bearer ', '');
+    const token = req.header("Authorization")?.replace("Bearer ", "");
 
     if (!token) {
-      return res.status(401).json({ message: 'Keine Authentifizierung' });
+      return res.status(401).json({ message: "Keine Authentifizierung" });
     }
 
     const decoded = jwt.verify(token, process.env.JWT_SECRET);
     const { picture } = req.body;
 
     if (!picture) {
-      return res.status(400).json({ message: 'Kein Bild übermittelt' });
+      return res.status(400).json({ message: "Kein Bild übermittelt" });
     }
 
     // Base64 zu Buffer konvertieren
-    const imageBuffer = Buffer.from(picture, 'base64');
+    const imageBuffer = Buffer.from(picture, "base64");
 
     // Bild in der Datenbank aktualisieren
-    await pool.query('UPDATE user SET picture = ? WHERE id = ?', [
+    await pool.query("UPDATE user SET picture = ? WHERE id = ?", [
       imageBuffer,
       decoded.userId,
     ]);
 
-    res.json({ message: 'Profilbild erfolgreich aktualisiert' });
+    res.json({ message: "Profilbild erfolgreich aktualisiert" });
   } catch (error) {
-    console.error('Fehler beim Aktualisieren des Profilbilds:', error);
+    console.error("Fehler beim Aktualisieren des Profilbilds:", error);
     res
       .status(500)
-      .json({ message: 'Serverfehler beim Aktualisieren des Profilbilds' });
+      .json({ message: "Serverfehler beim Aktualisieren des Profilbilds" });
   }
 });
 
 // Aquarium-Bild aktualisieren
-router.put('/profile/aquarium', async (req, res) => {
+router.put("/profile/aquarium", async (req, res) => {
   try {
-    const token = req.header('Authorization')?.replace('Bearer ', '');
+    const token = req.header("Authorization")?.replace("Bearer ", "");
 
     if (!token) {
-      return res.status(401).json({ message: 'Keine Authentifizierung' });
+      return res.status(401).json({ message: "Keine Authentifizierung" });
     }
 
     const decoded = jwt.verify(token, process.env.JWT_SECRET);
     const { aquarium } = req.body;
 
     if (!aquarium) {
-      return res.status(400).json({ message: 'Kein Bild übermittelt' });
+      return res.status(400).json({ message: "Kein Bild übermittelt" });
     }
 
     // Base64 zu Buffer konvertieren
-    const imageBuffer = Buffer.from(aquarium, 'base64');
+    const imageBuffer = Buffer.from(aquarium, "base64");
 
     // Bild in der Datenbank aktualisieren
-    await pool.query('UPDATE user SET tank = ? WHERE id = ?', [
+    await pool.query("UPDATE user SET tank = ? WHERE id = ?", [
       imageBuffer,
       decoded.userId,
     ]);
 
-    res.json({ message: 'Aquarium-Bild erfolgreich aktualisiert' });
+    res.json({ message: "Aquarium-Bild erfolgreich aktualisiert" });
   } catch (error) {
-    console.error('Fehler beim Aktualisieren des Aquarium-Bildes:', error);
+    console.error("Fehler beim Aktualisieren des Aquarium-Bildes:", error);
     res
       .status(500)
-      .json({ message: 'Serverfehler beim Aktualisieren des Aquarium-Bildes' });
+      .json({ message: "Serverfehler beim Aktualisieren des Aquarium-Bildes" });
   }
 });
 
 // Lieblingsfisch aktualisieren
-router.put('/profile/favoritefish', async (req, res) => {
+router.put("/profile/favoritefish", async (req, res) => {
   try {
-    const token = req.header('Authorization')?.replace('Bearer ', '');
+    const token = req.header("Authorization")?.replace("Bearer ", "");
 
     if (!token) {
-      return res.status(401).json({ message: 'Keine Authentifizierung' });
+      return res.status(401).json({ message: "Keine Authentifizierung" });
     }
 
     const decoded = jwt.verify(token, process.env.JWT_SECRET);
     const { favoritefish } = req.body;
 
     // Lieblingsfisch in der Datenbank aktualisieren
-    await pool.query('UPDATE user SET favoritefish = ? WHERE id = ?', [
+    await pool.query("UPDATE user SET favoritefish = ? WHERE id = ?", [
       favoritefish,
       decoded.userId,
     ]);
 
-    res.json({ message: 'Lieblingsfisch erfolgreich aktualisiert' });
+    res.json({ message: "Lieblingsfisch erfolgreich aktualisiert" });
   } catch (error) {
-    console.error('Fehler beim Aktualisieren des Lieblingsfisches:', error);
+    console.error("Fehler beim Aktualisieren des Lieblingsfisches:", error);
     res.status(500).json({
-      message: 'Serverfehler beim Aktualisieren des Lieblingsfisches',
+      message: "Serverfehler beim Aktualisieren des Lieblingsfisches",
     });
   }
 });
 
 // Benutzerinformationen abrufen (geschützter Endpunkt)
-router.get('/me', async (req, res) => {
+router.get("/me", async (req, res) => {
   try {
     // Token aus dem Authorization-Header extrahieren
-    const token = req.header('Authorization')?.replace('Bearer ', '');
+    const token = req.header("Authorization")?.replace("Bearer ", "");
 
     if (!token) {
-      return res.status(401).json({ message: 'Keine Authentifizierung' });
+      return res.status(401).json({ message: "Keine Authentifizierung" });
     }
 
     // Token verifizieren
     const decoded = jwt.verify(token, process.env.JWT_SECRET);
 
     // Benutzerinformationen abrufen
-    const [users] = await pool.query('SELECT * FROM user WHERE id = ?', [
+    const [users] = await pool.query("SELECT * FROM user WHERE id = ?", [
       decoded.userId,
     ]);
 
     if (users.length === 0) {
-      return res.status(404).json({ message: 'Benutzer nicht gefunden' });
+      return res.status(404).json({ message: "Benutzer nicht gefunden" });
     }
 
     // Bild in Base64 konvertieren
     const imageBase64 = users[0].picture
-      ? Buffer.from(users[0].picture).toString('base64')
+      ? Buffer.from(users[0].picture).toString("base64")
       : null;
 
     const aquariumBase64 = users[0].aquarium
-      ? Buffer.from(users[0].aquarium).toString('base64')
+      ? Buffer.from(users[0].aquarium).toString("base64")
       : null;
 
     const user = {
@@ -327,8 +327,8 @@ router.get('/me', async (req, res) => {
 
     res.json(user);
   } catch (error) {
-    console.error('Fehler beim Abrufen der Benutzerinformationen:', error);
-    res.status(401).json({ message: 'Ungültiger Token' });
+    console.error("Fehler beim Abrufen der Benutzerinformationen:", error);
+    res.status(401).json({ message: "Ungültiger Token" });
   }
 });
 

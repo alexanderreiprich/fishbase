@@ -2,7 +2,7 @@ import { Grid } from "@mui/material";
 import AnimalCard from "../components/AnimalCard";
 import { Animal } from "../interfaces/Animal";
 import { useEffect, useState } from "react";
-import '../style/ListPage.css';
+import "../style/ListPage.css";
 import { Plant } from "../interfaces/Plant";
 import PlantCard from "../components/PlantCard";
 import { InhabitantType } from "../interfaces/InhabitantType";
@@ -20,7 +20,11 @@ const ListPage: React.FC = () => {
         const data = await repository.getAllInhabitants();
         setInhabitants(data);
       } catch (err) {
-        setError(err instanceof Error ? err.message : 'Ein unbekannter Fehler ist aufgetreten');
+        setError(
+          err instanceof Error
+            ? err.message
+            : "Ein unbekannter Fehler ist aufgetreten"
+        );
       } finally {
         setLoading(false);
       }
@@ -35,16 +39,21 @@ const ListPage: React.FC = () => {
   return (
     <div>
       <Grid container spacing={1}>
-        {inhabitants.map((inhabitant, index) => (
-          inhabitant.type === InhabitantType.FISH || inhabitant.type === InhabitantType.INVERTEBRATE ? (
-            <AnimalCard key={index} animal={inhabitant as Animal} isPredatorConflict={false} />
+        {inhabitants.map((inhabitant, index) =>
+          inhabitant.type === InhabitantType.FISH ||
+          inhabitant.type === InhabitantType.INVERTEBRATE ? (
+            <AnimalCard
+              key={index}
+              animal={inhabitant as Animal}
+              isPredatorConflict={false}
+            />
           ) : (
             <PlantCard key={index} plant={inhabitant as Plant} />
           )
-        ))}
+        )}
       </Grid>
     </div>
   );
 };
 
-export default ListPage;	
+export default ListPage;

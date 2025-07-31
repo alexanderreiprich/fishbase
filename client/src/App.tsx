@@ -1,4 +1,9 @@
-import { BrowserRouter as Router, Routes, Route, Navigate } from "react-router-dom";
+import {
+  BrowserRouter as Router,
+  Routes,
+  Route,
+  Navigate,
+} from "react-router-dom";
 import "./App.css";
 import { ThemeProvider } from "@mui/material/styles";
 import CssBaseline from "@mui/material/CssBaseline";
@@ -18,9 +23,11 @@ import AquariumPage from "./pages/AquariumPage";
 import AddInhabitantsPage from "./pages/AddInhabitantsPage";
 import AquariumEditForm from "./components/AquariumEditForm";
 
-const ProtectedRoute: React.FC<{ children: React.ReactNode }> = ({ children }) => {
+const ProtectedRoute: React.FC<{ children: React.ReactNode }> = ({
+  children,
+}) => {
   const { user } = useAuth();
-  
+
   if (!user) {
     return <Navigate to="/login" />;
   }
@@ -50,7 +57,7 @@ function App() {
                 </ProtectedRoute>
               }
             />
-            <Route 
+            <Route
               path="/users/profile/:userId"
               element={
                 <ProtectedRoute>

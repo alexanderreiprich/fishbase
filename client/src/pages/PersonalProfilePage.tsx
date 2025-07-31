@@ -169,27 +169,41 @@ const PersonalProfilePage: React.FC = () => {
                 <Grid container spacing={3}>
                   {aquariums.map((aquarium) => (
                     <Grid size={{ xs: 12, sm: 6, md: 4 }} key={aquarium.id}>
-                      <Card variant="outlined" sx={{ height: '100%', borderColor: 'white' }}>
+                      <Card
+                        variant="outlined"
+                        sx={{ height: "100%", borderColor: "white" }}
+                      >
                         <CardContent>
                           <Typography variant="h6" gutterBottom>
                             {aquarium.name || `Aquarium ${aquarium.id}`}
                           </Typography>
-                          <Typography variant="body2" color="text.primary" gutterBottom>
+                          <Typography
+                            variant="body2"
+                            color="text.primary"
+                            gutterBottom
+                          >
                             Fassungsvermögen: {aquarium.capacity}L
                           </Typography>
-                          <Typography variant="body2" color="text.primary" gutterBottom>
+                          <Typography
+                            variant="body2"
+                            color="text.primary"
+                            gutterBottom
+                          >
                             Inhabitant ({aquarium.inhabitants.length}):
                           </Typography>
                           {aquarium.inhabitants.length > 0 ? (
                             <Box sx={{ pl: 2 }}>
                               {aquarium.inhabitants.map((inhabitant, index) => (
-                                <Typography 
-                                  key={inhabitant.id} 
-                                  variant="body2" 
+                                <Typography
+                                  key={inhabitant.id}
+                                  variant="body2"
                                   color="text.primary"
-                                  sx={{ 
-                                    fontSize: '0.875rem',
-                                    mb: index < aquarium.inhabitants.length - 1 ? 0.5 : 0
+                                  sx={{
+                                    fontSize: "0.875rem",
+                                    mb:
+                                      index < aquarium.inhabitants.length - 1
+                                        ? 0.5
+                                        : 0,
                                   }}
                                 >
                                   • {inhabitant.name} ({inhabitant.latinName})
@@ -197,7 +211,11 @@ const PersonalProfilePage: React.FC = () => {
                               ))}
                             </Box>
                           ) : (
-                            <Typography variant="body2" color="text.primary" sx={{ pl: 2, fontStyle: 'italic' }}>
+                            <Typography
+                              variant="body2"
+                              color="text.primary"
+                              sx={{ pl: 2, fontStyle: "italic" }}
+                            >
                               Keine Inhabitant vorhanden
                             </Typography>
                           )}
@@ -207,7 +225,7 @@ const PersonalProfilePage: React.FC = () => {
                   ))}
                 </Grid>
                 {aquariums.length === 0 && (
-                  <Box sx={{ textAlign: 'center', py: 4 }}>
+                  <Box sx={{ textAlign: "center", py: 4 }}>
                     <Typography variant="body1" color="text.primary">
                       Sie haben noch keine Aquarien erstellt.
                     </Typography>

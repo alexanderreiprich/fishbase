@@ -1,30 +1,30 @@
-import { useState } from "react"
-import { User } from "../interfaces/User"
-import { UserRepository } from "../repositories/UserRepository"
-import { SearchOptions } from "../interfaces/SearchOptions"
-import { Box, Grid, Typography } from "@mui/material"
-import { UserSearchForm } from "../components/UserSearchForm"
-import UserCard from "../components/UserCard"
+import { useState } from "react";
+import { User } from "../interfaces/User";
+import { UserRepository } from "../repositories/UserRepository";
+import { SearchOptions } from "../interfaces/SearchOptions";
+import { Box, Grid, Typography } from "@mui/material";
+import { UserSearchForm } from "../components/UserSearchForm";
+import UserCard from "../components/UserCard";
 
 const CommunityPage: React.FC = () => {
-  const [users, setUsers] = useState<User[]>([])
-  const [loading, setLoading] = useState(false)
-  const [hasSearched, setHasSearched] = useState(false)
-  const [lastSearchParams] = useState<SearchOptions | undefined>(undefined)
+  const [users, setUsers] = useState<User[]>([]);
+  const [loading, setLoading] = useState(false);
+  const [hasSearched, setHasSearched] = useState(false);
+  const [lastSearchParams] = useState<SearchOptions | undefined>(undefined);
 
   const handleSearch = async (searchOptions: SearchOptions) => {
-    setLoading(true)
-    setHasSearched(true)
+    setLoading(true);
+    setHasSearched(true);
 
-    const repository = UserRepository.getInstance()
-    const data = await repository.getUsers(searchOptions)
+    const repository = UserRepository.getInstance();
+    const data = await repository.getUsers(searchOptions);
 
-    setUsers(data)
-    setLoading(false)
-  }
+    setUsers(data);
+    setLoading(false);
+  };
 
   if (loading) {
-    return <div>Lädt...</div>
+    return <div>Lädt...</div>;
   }
 
   return (
@@ -60,7 +60,7 @@ const CommunityPage: React.FC = () => {
         </>
       )}
     </Box>
-  )
-}
+  );
+};
 
-export default CommunityPage
+export default CommunityPage;
