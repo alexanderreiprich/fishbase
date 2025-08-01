@@ -22,19 +22,19 @@ Contributors: Alexander Reiprich, Chiara Schepke
 4. Make sure the created database is running
    by logging into MySQL `mysql -u root -p`
    and entering SHOW PROCESSLIST you can check if fishbase exists
-5. add database details to /server/.env file as follows:
+5. Add database details to /server/.env file as follows:
 
    MYSQLHOST=localhost # or any other IP you want the database to be running on
 
    MYSQLPORT=3306 # the port you want the database to be running on - 3000 is taken by the app, 3001 is taken by the server
    
-   MYSQLUSER=<user> # the user you chose on mysql install
+   MYSQLUSER=<$user> # the user you chose on mysql install
    
-   MYSQLPASSWORD=<password> # the password you chose on mysql install, comment this line out if there is no password
+   MYSQLPASSWORD=<$password> # the password you chose on your MySQL install, comment this line out if there is no password
    
    MYSQLDATABASE=fishbase
    
-   JWT_SECRET=<jwt>; (at this time you can use the default token from jwt.io)
+   JWT_SECRET=<$jwt>; (at this time you can use the default token from jwt.io)
 
 6. Execute 'addImgs' script in server/package.json `npm run addImgs` to add the images
 7. Run `npm run start` in both the client and server directories
