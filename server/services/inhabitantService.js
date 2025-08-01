@@ -155,6 +155,8 @@ async function searchWithWildcards(
   let query = `SELECT * FROM inhabitant A, water_quality B WHERE ${whereClauses.join(
     " AND "
   )}`;
+  console.log(query);
+  console.log(params);
   const [inhabitants] = await pool.query(query, params);
   return inhabitants;
 }
@@ -209,6 +211,8 @@ async function searchWithOrConstraint(
   let query = `SELECT * FROM inhabitant A, water_quality B WHERE ${whereClauses.join(
     " AND "
   )} AND (${orConditions.join(" OR ")})`;
+  console.log(query);
+  console.log(params);
   const [inhabitants] = await pool.query(query, params);
   return inhabitants;
 }
